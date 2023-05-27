@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import './style/reset.scss';
+import './style/global.scss';
+import SignInPage from "./pages/signIn";
+import MainPage from "./pages/main";
+import HomePage from "./pages/home";
+import CashBookPage from "./pages/cashbook";
+import SettingsPage from "./pages/settings";
+
 
 function App() {
+
+  useEffect(() => {
+    // const token = localStorage.getItem('token')
+    // console.log('토큰', token)
+  }, [])
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="sign-in" element={<SignInPage />} />
+
+        <Route path="" element={<MainPage />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/:id" element={<CashBookPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
