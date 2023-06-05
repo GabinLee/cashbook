@@ -3,6 +3,7 @@ import { Colors } from "../../style/Styles";
 
 
 export const Container = styled.div`
+  min-width: 1440px;
   display: flex;
   
   header{

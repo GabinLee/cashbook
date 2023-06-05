@@ -143,7 +143,8 @@ export default function EditPaymentMethodModal(props: EditPaymentMethod) {
                     ))}
                   </select>
                 </div>
-                <p>할부 시 전월 1일부터 전월 말일까지의 이용내역이 당월 14일에 표시됩니다.</p>
+                <p>전월 1일부터 전월 말일까지의 이용내역이 당월 {paymentDay}일에 표시됩니다.</p>
+                {/* <p>할부 시</p> */}
               </div>
             </div>
           )}
@@ -226,7 +227,7 @@ const Container = styled.div`
       > p{
         line-height: 40px;
       }
-      .select_box + p{
+      div p{
         width: 240px;
         margin-top: 12px;
         padding-left: 12px;

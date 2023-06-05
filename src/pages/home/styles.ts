@@ -19,7 +19,7 @@ export const Container = styled.main`
     padding-bottom: 12px;
     display: flex;
     flex-wrap: wrap;
-    overflow: auto;
+    /* align-items: flex-start; */
     
     li{
       width: calc(100% * 1/3);
@@ -43,10 +43,6 @@ export const Container = styled.main`
       background-color: ${Colors.light_main};
     }
 
-    .name_more{
-      margin-bottom: 12px;
-    }
-
     h6{
       padding-right: 6px;
     }
@@ -64,6 +60,7 @@ export const Container = styled.main`
     }
 
     .member{
+      margin-top: 12px;
       color: ${Colors.gray_5};
     }
   }

@@ -6,6 +6,7 @@ import axios from "axios"
 import { useParams } from "react-router-dom"
 import FirstCategory, { SecondCategory, ThirdCategory } from "../../models/Category.model"
 import PaymentMethod from "../../models/PaymentMethod.model"
+import { Colors } from "../../style/Styles"
 
 type EditHistory = {
   cashbookHistory?: CashbookHistory
@@ -13,10 +14,6 @@ type EditHistory = {
   paymentMethodList: PaymentMethod[]
   onClickCancel: () => void
   onComplete: () => void
-  // addHistory: (description: string) => void
-  // editHistory: () => void
-  // addCashbook: (cashbookName: string) => void
-  // editCashbook: (id: number, cashbookName: string) => void
 }
 
 export default function EditHistoryModal(props: EditHistory) {
@@ -27,40 +24,55 @@ export default function EditHistoryModal(props: EditHistory) {
   const [paymentMethodList] = useState<PaymentMethod[]>(props.paymentMethodList)
 
   const [selectedFirstCateogry, setSelectedFirstCategory] = useState<FirstCategory|null>(props.cashbookHistory ? props.cashbookHistory.firstCategory : null)
-  const [date, setDate] = useState(moment().format('YYYY-MM-DD'))
+  const [date, setDate] = useState(props.cashbookHistory ? moment(props.cashbookHistory.date).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'))
   const [description, setDescription] = useState(props.cashbookHistory ? props.cashbookHistory.description : '')
   const [inputPrice, setInputPrice] = useState(props.cashbookHistory ? props.cashbookHistory.price : '')
   const [price, setPrice] = useState(props.cashbookHistory ? props.cashbookHistory.price : 0)
   const [selectedSecondCategory, setSelectedSecondCateogory] = useState<SecondCategory|null>(props.cashbookHistory ? props.cashbookHistory.secondCategory : null)
   const [selectedThirdCategory, setSelectedThirdCategory] = useState<ThirdCategory|null>(props.cashbookHistory ? props.cashbookHistory.thirdCategory : null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod|null>(props.cashbookHistory ? props.cashbookHistory.paymentMethod : null)
+  const [receiptImgae] = useState(props.cashbookHistory ? props.cashbookHistory.imageList : null)
+  const [selectedReceiptImage, setSelectedReceiptImage] = useState<File[]|null>(null);
   
-  
+  const isValidConfirm = !(description && price && selectedFirstCateogry)
+
 
   useEffect(() => {
     tokenRef.current = localStorage.getItem('token') ?? ``
 
-    const first = cateogryList.find(v => v.id === 1)
+    const first = cateogryList.find(v => v.name === "지출")
 
     if(first) {
       setSelectedFirstCategory(first)
     }
-
   }, [])
 
-  const isValidConfirm = !(description && price && selectedFirstCateogry && selectedSecondCategory && selectedPaymentMethod)
-
-
   const addHistory = () => {
-    axios.post(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/detail`, {
-      date: date,
-      description: description,
-      price: price,
-      firstCategoryId: selectedFirstCateogry?.id,
-      secondCategoryId: selectedSecondCategory?.id,
-      thirdCategoryId: selectedThirdCategory?.id,
-      paymentMethodId: selectedPaymentMethod?.id
-    }, {
+
+    if(selectedFirstCateogry === null) return;
+
+    const formData = new FormData();
+    formData.append('date', date)
+    formData.append('description', description)
+    formData.append('price', `${price}`)
+    formData.append('firstCategoryId', `${selectedFirstCateogry.id}`)
+    if(selectedSecondCategory !== null) {
+      formData.append('secondCategoryId', `${selectedSecondCategory.id}`)
+    }
+    if(selectedThirdCategory !== null) {
+      formData.append('thirdCategoryId', `${selectedThirdCategory.id}`)
+    }
+    if(selectedPaymentMethod !== null) {
+      formData.append('paymentMethodId', `${selectedPaymentMethod.id}`)
+    }
+    
+    if(selectedReceiptImage !== null){
+      selectedReceiptImage.map((img) => (
+        formData.append('images', img)
+      ))
+    }
+
+    axios.post(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/detail`, formData, {
       headers: {
         Authorization: `Bearer ${tokenRef.current}`
       }
@@ -141,7 +153,7 @@ export default function EditHistoryModal(props: EditHistory) {
                   }}
                 />
                 <label htmlFor={`first${first.id}`}>
-                  <span className={`checkmark first${first.id}`} />
+                  <span className={`checkmark ${first.name === '지출' ? 'first1' : `${first.name === '수입' ? 'first2' : 'first3'}`}`} />
                   <p>{first.name}</p>
                 </label>
               </div>
@@ -235,6 +247,47 @@ export default function EditHistoryModal(props: EditHistory) {
               // onChange={e => set()}
             />
           </div> */}
+
+          <div className="input_field flex ai-c receipt">
+            <p>영수증</p>
+            <input type="file" id="receipt_img" accept="image/*" multiple
+              onChange={e => {
+                const images = e.currentTarget.files;
+
+                console.log('images', images)
+
+                if(images === null || images.length === 0) return []
+
+                const files: File[] = [];
+                for(let i = 0; i < images.length; i++) {
+                  const img = images.item(i);
+
+                  if(img !== null) {
+                    files.push(img)
+                  }
+                }
+                return setSelectedReceiptImage(files)
+              }}
+            />
+            <label htmlFor="receipt_img" className="add_img"/>
+          </div>
+          <div className="img_list flex ai-s">
+            {(receiptImgae !== null && selectedReceiptImage === null) && (
+              <>
+              {receiptImgae.map((img, index) => (
+                <img src={`${process.env.REACT_APP_IMAGE_URL}receipt/${img.image}`} alt="영수증" key={`img${index}`} />
+              ))}
+              </>
+            )}
+            
+            {selectedReceiptImage !== null && (
+              <>
+              {selectedReceiptImage.map((img, index) => (
+                <img src={URL.createObjectURL(img)} alt="영수증" key={`img${index}`} />
+              ))}
+              </>
+            )}
+          </div>
         </div>
 
         <div className="card_bottom">
@@ -257,8 +310,10 @@ export default function EditHistoryModal(props: EditHistory) {
 
 const Container = styled.div`
   .card_middle{
+    width: 348px;
+    margin: 12px 0;
     .group_radio{
-      height: 40px;
+      /* height: 40px; */
       justify-content: space-around;
       .radio_field{
         input[type="radio"]{
@@ -303,6 +358,36 @@ const Container = styled.div`
       }
       input, .select_box{
         width: 240px;
+      }
+
+      &.receipt{
+        input{
+          display: none;
+        }
+        label.add_img{
+          width: 40px;
+          min-width: 40px;
+          height: 40px;
+          border: 1px solid ${Colors.gray_be};
+          border-radius: 50%;
+          background: url(images/add_photo.svg) no-repeat center center;
+          &:hover{
+            background: ${Colors.gray_e5} url(images/add_photo.svg) no-repeat center center;
+          }
+        }
+        + .img_list{
+          width: 348px;
+          height: 102px;
+          margin-left: -24px;
+          padding: 12px 12px 0 84px;
+          overflow: auto;
+          img{
+            width: 60px;
+            min-width: 60px;
+            height: 90px;
+            margin-right: 12px;
+          }
+        }
       }
     }
   }

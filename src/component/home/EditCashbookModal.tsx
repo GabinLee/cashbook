@@ -26,7 +26,7 @@ export default function EditCashbookModal(props: EditCashBook) {
   return(
     <Container className="modal">
       <div className="card">
-        <h6 className="card_top">캐시북 {props.cashbook ? '수정' : '추가'}하기</h6>
+        <h6 className="card_top">캐쉬북 {props.cashbook ? '수정' : '추가'}하기</h6>
 
         <div className="card_middle">
           <div className="input_field">

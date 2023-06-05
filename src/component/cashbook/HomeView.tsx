@@ -14,13 +14,14 @@ export default function CashbookHome() {
 
   const [historyList, setHistoryList] = useState<CashbookHistory[]>([])
 
+  const [month, setMonth] = useState(moment().format('YYYY-MM'))
   const [totalExpense, setTotalExpense] = useState(0)
   const [totalSaving, setTotalSaving] = useState(0)
   const [totalIncome, setTotalIncome] = useState(0)
 
-  const expenseList = historyList.filter(v => v.firstCategoryId === 1)
-  const incomeList = historyList.filter(v => v.firstCategoryId === 2)
-  const savingList = historyList.filter(v => v.firstCategoryId === 3)
+  const expenseList = historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategoryId === 1)
+  const incomeList = historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategoryId === 2)
+  const savingList = historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategoryId === 3)
 
   useEffect(() => {
     tokenRef.current = localStorage.getItem('token') ?? ''

@@ -10,10 +10,10 @@ import EditPaymentMethodModal from "./EditPaymentMethodModal";
 import PaymentMethod from "../../models/PaymentMethod.model";
 
 
-export default function CashbookSettings() {
+export default function SettingsView() {
   const {id} = useParams()
   const tokenRef = useRef('')
-  const popoverRef = useRef<any>(null)
+  // const popoverRef = useRef<any>(null)
 
   const [cateogryList, setCategoryList] = useState<FirstCategory[]>([])
   const [selectedFirst, setSelectedFirst] = useState<FirstCategory>()
@@ -37,27 +37,27 @@ export default function CashbookSettings() {
     getPaymentMethod()
   }, [id])
 
-  useEffect(() => {
-    const outsideTouch = (e: MouseEvent) => {
-      if(popoverRef.current && !popoverRef.current.contains(e.target)) {
-        setCategoryList(cateogryList.map(value => {
-          value.secondCategoryList.map(firstValue => (
-            firstValue.isShowMoreMenu = false
-          ))
-          return value
-        }))
+  // useEffect(() => {
+  //   const outsideTouch = (e: MouseEvent) => {
+  //     if(popoverRef.current && !popoverRef.current.contains(e.target)) {
+  //       setCategoryList(cateogryList.map(value => {
+  //         value.secondCategoryList.map(firstValue => (
+  //           firstValue.isShowMoreMenu = false
+  //         ))
+  //         return value
+  //       }))
 
-        getCategory()
-      }
-    }
+  //       getCategory()
+  //     }
+  //   }
 
-    // window.addEventListener("mousedown", outsideTouch)
-    window.addEventListener("mouseup", outsideTouch)
-    return () => {
-      // window.removeEventListener("mousedown", outsideTouch)
-      window.removeEventListener("mouseup", outsideTouch)
-    }
-  }, [popoverRef])
+  //   // window.addEventListener("mousedown", outsideTouch)
+  //   window.addEventListener("mouseup", outsideTouch)
+  //   return () => {
+  //     // window.removeEventListener("mousedown", outsideTouch)
+  //     window.removeEventListener("mouseup", outsideTouch)
+  //   }
+  // }, [popoverRef])
 
   const getCategory = () => {
     axios.get(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/trade-category`, {
@@ -179,43 +179,58 @@ export default function CashbookSettings() {
                                 if(first.id === firstItem.id) {
                                   first.secondCategoryList.map(second => {
                                     if(second.id === secondItem.id) {
-                                      !second.isShowMoreMenu && (second.isShowMoreMenu = true)
+                                      // !second.isShowMoreMenu && (second.isShowMoreMenu = true)
+                                      second.isShowMoreMenu = !second.isShowMoreMenu
+                                    } else{
+                                      second.isShowMoreMenu = false
                                     }
+
                                     return second
                                   })
+                                } else{
+                                  first.secondCategoryList.map(second => {
+                                    second.isShowMoreMenu = false
+                                  })
                                 }
+
+                                first.secondCategoryList.map(second => {
+                                  second.thirdCategoryList.map(third => {
+                                    third.isShowMoreMenu = false
+                                  })
+                                })
+                                
                                 return first
                               }))
                             }}
                           />
                           {secondItem.isShowMoreMenu && (
                             <div className="popover_menu"
-                              ref={popoverRef}
+                              // ref={popoverRef}
                             >
                               <button type="button"
                                 onClick={() => {
                                   setShowEditSecondCategoryModal(true)
                                   setSelectedFirst(firstItem)
                                   setSelectedSecond(secondItem)
-                                  setCategoryList(cateogryList.map(value => {
-                                    if(value.id === firstItem.id) {
-                                      value.secondCategoryList.map(firstValue => {
-                                        if(firstValue.id === secondItem.id) {
-                                          firstValue.isShowMoreMenu = !firstValue.isShowMoreMenu
+                                  setCategoryList(cateogryList.map(first => {
+                                    if(first.id === firstItem.id) {
+                                      first.secondCategoryList.map(second => {
+                                        if(second.id === secondItem.id) {
+                                          second.isShowMoreMenu = !second.isShowMoreMenu
                                         } else{
-                                          firstValue.isShowMoreMenu = false
+                                          second.isShowMoreMenu = false
                                         }
 
-                                        return firstValue
+                                        return second
                                       })
                                     } else{
-                                      value.secondCategoryList.map(firstValue => {
-                                        firstValue.isShowMoreMenu = false
+                                      first.secondCategoryList.map(second => {
+                                        second.isShowMoreMenu = false
 
-                                        return firstValue
+                                        return second
                                       })
                                     }
-                                    return value
+                                    return first
                                   }))
                                 }}
                               >수정</button>
@@ -250,11 +265,21 @@ export default function CashbookSettings() {
                                         if(second.id === secondItem.id){
                                           second.thirdCategoryList.map(third => {
                                             if(third.id === thirdItem.id){
-                                              !third.isShowMoreMenu && (third.isShowMoreMenu = true)
+                                              // !third.isShowMoreMenu && (third.isShowMoreMenu = true)
+                                              third.isShowMoreMenu = !third.isShowMoreMenu
+                                            } else{
+                                              third.isShowMoreMenu = false
                                             }
                                             return third
                                           })
+                                        } else{
+                                          second.thirdCategoryList.map(third => {
+                                            third.isShowMoreMenu = false
+                                          })
                                         }
+
+                                        second.isShowMoreMenu = false
+
                                         return second
                                       })
                                     )
@@ -264,7 +289,7 @@ export default function CashbookSettings() {
                               />
                               {thirdItem.isShowMoreMenu && (
                                 <div className="popover_menu"
-                                  ref={popoverRef}
+                                  // ref={popoverRef}
                                 >
                                   <button type="button"
                                     onClick={() => {
@@ -272,6 +297,19 @@ export default function CashbookSettings() {
                                       setSelectedFirst(firstItem)
                                       setSelectedSecond(secondItem)
                                       setSelectedThird(thirdItem)
+                                      setCategoryList(cateogryList.map(first => {
+                                        first.secondCategoryList.map(second => {
+                                          second.thirdCategoryList.map(third => {
+                                            third.isShowMoreMenu = false
+
+                                            return third
+                                          })
+
+                                          return second
+                                        })
+
+                                        return first
+                                      }))
                                     }}
                                   >수정</button>
                                   <button type="button"
@@ -467,57 +505,60 @@ const Container = styled.div`
             .type{
               padding: 12px 18px;
             }
-            li.grid{
-              grid-template-columns: 140px auto;
-              + li{
-                border-top: 1px solid ${Colors.gray_e5};
-                &:not(.grid){
-                  padding: 5px 10px;
+            li{
+              &.grid{
+                grid-template-columns: 140px auto;
+                + li{
+                  border-top: 1px solid ${Colors.gray_e5};
                 }
-              }
-              
-              .first{
-                padding: 5px 9px 5px 18px;
-                .popover{
-                  width: 34px;
-                  height: 30px;
-                }
-              }
-
-              ul.second{
-                li{
-                  &:nth-child(1){
-                    padding: 0 3px 0 10px;
+                
+                .first{
+                  padding: 5px 9px 5px 18px;
+                  .popover{
+                    width: 34px;
+                    height: 30px;
                   }
-                  &.flex.ai-c{
-                    height: 100%;
-                    padding: 6px 7px 6px 14px;
-                    position: relative;
-                    &:before{
-                      content: '';
-                      width: calc(100% - 6px);
-                      height: calc(100% - 12px);
-                      border-radius: 15px;
-                      background-color: ${Colors.light_main};
-                      position: absolute;
-                      top: 6px;
-                      left: 3px;
+                }
+
+                ul.second{
+                  li{
+                    &:nth-child(1){
+                      padding: 0 3px 0 10px;
                     }
-                    p{
+                    &.flex.ai-c{
+                      height: 100%;
+                      padding: 6px 7px 6px 14px;
                       position: relative;
-                    }
-                    .popover{
-                      width: 28px;
-                      height: 24px;
-                      .btn.more{
-                        background: url(images/more.svg) no-repeat center center / 12px 12px;
-                        &:hover{
-                          background: white url(images/more.svg) no-repeat center center / 12px 12px;
+                      &:before{
+                        content: '';
+                        width: calc(100% - 6px);
+                        height: calc(100% - 12px);
+                        border-radius: 15px;
+                        background-color: ${Colors.light_main};
+                        position: absolute;
+                        top: 6px;
+                        left: 3px;
+                      }
+                      p{
+                        position: relative;
+                      }
+                      .popover{
+                        width: 28px;
+                        height: 24px;
+                        .btn.more{
+                          background: url(images/more.svg) no-repeat center center / 12px 12px;
+                          &:hover{
+                            background: white url(images/more.svg) no-repeat center center / 12px 12px;
+                          }
                         }
                       }
                     }
                   }
                 }
+              }
+
+              &:not(.grid){
+                padding: 5px 10px;
               }
             }
           }

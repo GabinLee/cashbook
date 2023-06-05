@@ -59,13 +59,19 @@
   // --border_gray_e5: 1px solid var(--gray_e5);
 }
 
+.color_main{ color: var(--main); }
+.color_red{ color: var(--red); }
+.color_yellow{ color: var(--yellow); }
+.color_green{ color: var(--green); }
 .fs12{ font-size: 12px; }
 
 .flex1{ flex: 1; }
 .flex{ display: flex; }
 .ai-c{ align-items: center; }
+.ai-s{ align-items: flex-start; }
 .ai-e{ align-items: flex-end; }
 .jc-c{ justify-content: center; }
+.jc-sb{ justify-content: space-between; }
 .flex-c{ display: flex; align-items: center; justify-content: center; }
 .flex-wrap{ flex-wrap: wrap; }
 
@@ -325,6 +331,7 @@ input[type="checkbox"] {
     }
     .mark {
       width: 18px;
+      min-width: 18px;
       height: 18px;
       margin-right: 10px;
       border: 1px solid var(--gray_be);
@@ -394,6 +401,7 @@ input[type="checkbox"] {
 
 
 .modal{
+  padding: 60px;
   background-color: rgba(0, 0, 0, 0.5);
   inset: 0px;
   display: flex;
@@ -403,7 +411,9 @@ input[type="checkbox"] {
   z-index: 101;
   .card{
     min-width: 260px;
+    max-height: 100%;
     border-radius: 24px;
+    overflow: auto;
 
     &_top{
       padding: 24px 24px 0;
@@ -459,13 +469,13 @@ input[type="checkbox"] {
   }
   &_menu, &.card{
     border-radius: 12px;
-    background-color: white;
-    box-shadow: rgba(34, 34, 34, 0.1) 2px 2px 6px 2px;
     position: absolute;
     z-index: 1;
     overflow: hidden;
   }
   &_menu{
+    background-color: white;
+    box-shadow: rgba(34, 34, 34, 0.1) 2px 2px 6px 2px;
     right: 0;
     button{
       padding: 10px 24px;

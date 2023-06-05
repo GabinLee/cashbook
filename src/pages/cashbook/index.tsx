@@ -3,23 +3,24 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Container } from "./styles";
 import CashbookHome from "../../component/cashbook/HomeView";
-import CashbookList from "../../component/cashbook/ListView";
+import ListView from "../../component/cashbook/ListView";
 import CashbookStatistics from "../../component/cashbook/StatisticsView";
-import CashbookSettings from "../../component/cashbook/SettingsView";
+import SettingsView from "../../component/cashbook/SettingsView";
 import CashbookHistory from "../../models/CashbookHistory.model";
+import ListView0531 from "../../component/cashbook/ListView0531";
 
 
 export default function CashbookPage() {
   const {id} = useParams()
   const tokenRef = useRef('')
   
-  const [activeTab, setActiveTab] = useState(1)
+  const [activeTab, setActiveTab] = useState(2)
 
 
   useEffect(() => {
     tokenRef.current = localStorage.getItem('token') ?? ''
     
-    console.log('캐쉬북 페이지 - 토큰ref', tokenRef.current)
+    // console.log('캐쉬북 페이지 - 토큰ref', tokenRef.current)
   }, [])
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function CashbookPage() {
     })
     .then(response => {
       if(response.data.success) {
-        console.log('캐쉬북 조회 성공')
+        // console.log('캐쉬북 조회 성공')
         
         // console.log('캐쉬북 페이지 - response data', response.data.data)
 
@@ -58,11 +59,11 @@ export default function CashbookPage() {
           className={activeTab === 2 ? 'active' : ''}
           onClick={() => setActiveTab(2)}
         >List</button>
-        <button
+        {/* <button
           type="button"
           className={activeTab === 3 ? 'active' : ''}
           onClick={() => setActiveTab(3)}
-        >Statistics</button>
+        >Statistics</button> */}
         <button
           type="button"
           className={activeTab === 4 ? 'active' : ''}
@@ -75,15 +76,16 @@ export default function CashbookPage() {
       )}
 
       {activeTab === 2 && (
-        <CashbookList />
+        <ListView />
+        // <ListView0531 />
       )}
 
-      {activeTab === 3 && (
+      {/* {activeTab === 3 && (
         <CashbookStatistics />
-      )}
+      )} */}
 
       {activeTab === 4 && (
-        <CashbookSettings />
+        <SettingsView />
       )}
     </Container>
   )

@@ -1,19 +1,20 @@
 import styled from "styled-components"
 import { Colors } from "../../style/Styles"
-import { useEffect, useRef, useState } from "react"
+import { memo, useEffect, useRef, useState } from "react"
 import EditHistoryModal from "./EditHistoryModal"
 import moment from "moment"
 import axios from "axios"
 import { useParams } from "react-router-dom"
 import CashbookHistory, { HistoryFilterList } from "../../models/CashbookHistory.model"
-import FirstCategory from "../../models/Category.model"
+import FirstCategory, { SecondCategory } from "../../models/Category.model"
 import PaymentMethod from "../../models/PaymentMethod.model"
 
 
-export default function ListView() {
+export default function ListView0531() {
   
   const {id} = useParams()
   const tokenRef = useRef('')
+  // const popoverRef = useRef<any>(null)
 
   const [cateogryList, setCategoryList] = useState<FirstCategory[]>([])
   const [paymentMethodList, setPaymentMethodList] = useState<PaymentMethod[]>([])
@@ -21,54 +22,103 @@ export default function ListView() {
 
   const [month, setMonth] = useState(moment().format('YYYY-MM'))
 
-  const expenseList = historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategory?.name === '지출')
-  const incomeList = historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategory?.name === '수입')
-  const savingList = historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategory?.name === '저축')
+
+  const [filteredHistoryList, setFilteredHistoryList] = useState<CashbookHistory[]>([])
+  
+  const [selectedFirstFilterArray, setSelectedFirstFilterArray] = useState<number[]>([])
+  const [selectedSecondFilterArray, setSelectedSecondFilterArray] = useState<number[]>([])
+  // const [filterThirdCategoryArray, setFilterThirdCategoryArray] = useState<number[]>([])
+  // const [filterPaymentMethodCategory, setFilterPaymentMethodCategory] = useState()
+
+
+
+  const [selectedHistory, setSelectedHistory] = useState<CashbookHistory>()
+  const [showEditHistoryModal, setShowEditHistoryModal] = useState(false)
 
   const [totalExpense, setTotalExpense] = useState(0)
   const [totalSaving, setTotalSaving] = useState(0)
   const [totalIncome, setTotalIncome] = useState(0)
 
-  const [selectedHistory, setSelectedHistory] = useState<CashbookHistory>()
-  const [showEditHistoryModal, setShowEditHistoryModal] = useState(false)
-
   const [filterList, setFilterList] = useState(HistoryFilterList)
 
-  const [filteredHistoryList, setFilteredHistoryList] = useState<CashbookHistory[]>([])
+  // const [isInit, setIsInit] = useState<boolean>()
   
-  const [selectedFirstIdFilterArray, setSelectedFirstIdFilterArray] = useState<number[]>([])
-  // const [selectableSecondFilterArray, setSelectableSecondFilterArray] = useState<FirstCategory[]>([])
-  // const [selectedSecondIdFilterArray, setSelectedSecondIdFilterArray] = useState <number[]>([])
-  // const [selectableThirdFilterArray, setSelectableThirdFilterArray] = useState()
-  // const [selectedThirdFilterArray, setSelectedThirdFilterArray] = useState<number[]>([])
-
-
   useEffect(() => {
     tokenRef.current = localStorage.getItem('token') ?? ''
+
+    // console.log('isInit', isInit)
+
+    // if(isInit === undefined) {
+    //   console.log('false 임', isInit)
+    // }
+
   }, [])
 
   useEffect(() => {
     getCategory();
     getPaymentMethod();
     getHistory();
-
-    setFilteredHistoryList(historyList.filter(v => moment(v.date).format('YYYY-MM') === month))
-
-    console.log('필터된 목록', filteredHistoryList)
   }, [id])
 
+  // useEffect(() => {
+  //   const outsideTouch = (e: MouseEvent) => {
+  //     if(popoverRef.current && !popoverRef.current.contains(e.target)) {
+  //       setFilterList(filterList.map(value => {
+  //         value.isShowPopover = false
+
+  //         return value
+  //       }))
+
+  //       getCategory()
+  //     }
+  //   }
+
+  //   // window.addEventListener("mousedown", outsideTouch)
+  //   window.addEventListener("mouseup", outsideTouch)
+  //   return () => {
+  //     // window.removeEventListener("mousedown", outsideTouch)
+  //     window.removeEventListener("mouseup", outsideTouch)
+  //   }
+  // }, [popoverRef])
+  
   useEffect(() => {
+    // 거래유형 default
+    setSelectedFirstFilterArray(cateogryList.map(v => v.id));
+
+    // 1차 default
+    const defaultSecond = cateogryList.filter(v => selectedFirstFilterArray.includes(v.id)).map(v => v.secondCategoryList.map(second => second.id))
+
+    defaultSecond.forEach(second => {
+      setSelectedSecondFilterArray(selectedSecondFilterArray.concat(second))
+    })
+
+    let allSecondCategoryArray: number[] = []
+    cateogryList.forEach(v => {
+      allSecondCategoryArray = allSecondCategoryArray.concat(v.secondCategoryList.map(v => v.id))
+    })
+    setSelectedSecondFilterArray(allSecondCategoryArray)
+
+  }, [cateogryList])
+
+  useEffect(() => {
+
+    const expenseList = historyList.filter(v => v.firstCategoryId === 1)
+
     let monthlyExpense = 0
     expenseList.forEach(item => {
       monthlyExpense += item.price
     })
     setTotalExpense(monthlyExpense)
 
+    const incomeList = historyList.filter(v => v.firstCategoryId === 2)
+    
     let monthlyIncome = 0
     incomeList.forEach(item => {
       monthlyIncome += item.price
     })
     setTotalIncome(monthlyIncome)
+
+    const savingList = historyList.filter(v => v.firstCategoryId === 3)
     
     let monthlySaving = 0
     savingList.forEach(item => {
@@ -76,118 +126,13 @@ export default function ListView() {
     })
     setTotalSaving(monthlySaving)
 
-    // 거래유형 default
-    setSelectedFirstIdFilterArray(cateogryList.map(v => v.id))
-
-  }, [historyList, month])
+  }, [historyList])
 
   useEffect(() => {
-    setFilteredHistoryList(historyList.filter(v => moment(v.date).format('YYYY-MM') === month))
-
-  }, [month])
-
-  useEffect(() => {
-    setFilteredHistoryList(historyList.filter(v => {
-      return selectedFirstIdFilterArray.includes(v.firstCategoryId)
-    }))
-  }, [selectedFirstIdFilterArray])
-
-
-
-
-
-
-  // useEffect(() => {
-  //   // console.log('필터된 목록', filteredHistoryList)
-  //   // console.log('셀렉 가능 second', selectableSecondFilterArray)
-  //   // console.log('셀렉된 second', selectedSecondIdFilterArray)
-
-
-  //   // 1차 default
-  //   setSelectableSecondFilterArray(cateogryList.filter(first => {
-  //     return selectedFirstIdFilterArray.includes(first.id)
-  //   }))
-    
-  //   // console.log('검증', selectedSecondIdFilterArray)
-
-  //   // setSelectedSecondIdFilterArray()
-
-  //   // console.log('테스트', cateogryList.forEach(v => {
-  //   //   // setSelectedSecondIdFilterArray(selectableSecondFilterArray.map(first => first.secondCategoryList.filter(second => {
-  //   //   //   return selectedFirstIdFilterArray.includes(second.firstCategoryId)
-  //   //   // }).map(v => v.id)))
-  //   // }))
-
-
-  //   // console.log('검증', selectableSecondFilterArray.forEach(v => {
-  //   //   setSelectedSecondIdFilterArray(selectedSecondIdFilterArray.concat(v.secondCategoryList.filter(second => {
-  //   //     return selectedFirstIdFilterArray.includes(second.firstCategoryId)
-  //   //   }).map(v => v.id)))
-  //   // }))
-
-    
-  //   // selectableSecondFilterArray.map(first => first.secondCategoryList.filter(second => {
-  //   //   return selectedFirstIdFilterArray.includes(second.firstCategoryId)
-  //   // }).map(v => v))
-
-  //   // console.log('검증', selectableSecondFilterArray.forEach(v => {
-  //   //   v.secondCategoryList.filter(second => {
-  //   //     return selectedFirstIdFilterArray.includes(second.firstCategoryId)
-  //   //   }).map(v => v.id)
-  //   // }))
-
-
-  //   // let abc: number[] = []
-    
-    
-    
-  //   // .forEach(v => {
-  //   //   // abc = abc.concat(v.secondCategoryList.map(v => v.id))
-  //   //   setSelectedSecondIdFilterArray(v.secondCategoryList.map(v => v.id))
-  //   // })
-  //   // setSelectedSecondIdFilterArray(abc)
-
-  //   const defaultSecond = cateogryList.filter(v => selectedFirstIdFilterArray.includes(v.id)).map(v => v.secondCategoryList.map(second => second.id))
-
-  //   // defaultSecond.forEach(second => {
-  //   //   setSelectedSecondIdFilterArray(selectedSecondIdFilterArray.concat(second))
-  //   // })
-
-  //   // const extraction = selectableSecondFilterArray.filter(v => selectedFirstIdFilterArray.includes(v.id)).map(v => v.secondCategoryList.map(second => second.id))
-  // }, [filteredHistoryList])
-
-
-  // useEffect(() => {
-  //   // 1차 default
-  //   // console.log('확인 selectableSecondFilterArray', selectableSecondFilterArray.filter(first => {
-  //   //   return selectedFirstIdFilterArray.includes(first.id)
-  //   // }))
-
-
-  //   //   const defaultSecond = cateogryList.filter(v => selectedFirstFilterArray.includes(v.id)).map(v => v.secondCategoryList.map(second => second.id))
-  // //   defaultSecond.forEach(second => {
-  // //     setSelectedSecondFilterArray(selectedSecondFilterArray.concat(second))
-  // //   })
-
-  // //   let allSecondCategoryArray: number[] = []
-  // //   cateogryList.forEach(v => {
-  // //     allSecondCategoryArray = allSecondCategoryArray.concat(v.secondCategoryList.map(v => v.id))
-  // //   })
-  // //   setSelectedSecondFilterArray(allSecondCategoryArray)
-    
-  //   // .map(first => first.secondCategoryList.map(second =>  second.name))
-    
-  //   // console.log('확인', cateogryList.map(first => first.secondCategoryList.map(second =>  second.name)))
-  //   // selectableSecondFilterArray
-  //   // selectedSecondIdFilterArray
-
-  //   // setFilteredHistoryList(historyList.filter(v => {
-  //   //   return selectedFirstFilterArray.includes(v.firstCategoryId)
-  //   // }))
-    
-  //   // 2차 default
-
-  // }, [selectedFirstIdFilterArray])
+    console.log('필터된 목록', filteredHistoryList)
+    console.log('first 필터 적용', selectedFirstFilterArray)
+    console.log('second 필터 적용', selectedSecondFilterArray)
+  }, [filteredHistoryList])
 
 
   const getCategory = () => {
@@ -265,10 +210,22 @@ export default function ListView() {
       }
     }).catch(error => console.log(error))
   }
+
+   // try {
+    //   const results = await axios.get(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/detail`, {
+    //     headers: {
+    //       Authorization: `Bearer ${tokenRef.current}`
+    //     }
+    //   })
+
+    //   results
+    // } catch (error) {
+      
+    // }
     
-  const addComma = (price: number) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
+    const addComma = (price: number) => {
+      return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 
 
   return (
@@ -298,7 +255,7 @@ export default function ListView() {
 
         <div className="area filter_add flex">
           <ul className="flex1 flex flex-wrap filter_group">
-            {filterList.filter(v => v.name === '거래유형').map((filter, index) => (
+            {filterList.map((filter, index) => (
               <li key={`filter${index}`} className="filter_group_item">
                 <button
                   onClick={() => {
@@ -315,85 +272,117 @@ export default function ListView() {
                 {filter.isShowPopover && (
                   <>
                     {filter.name === '거래유형' && (
-                      <ul className="popover card category_first flex ai-c jc-sb">
-                        {cateogryList.map((first, fIndex) => (
-                          <li key={`first${fIndex}`} className="checkbox_field">
-                            <input type="checkbox" id={`first${first.id}`} name="type"
-                              checked={selectedFirstIdFilterArray.includes(first.id)}
-                              onChange={e => {
-                                if(e.target.checked){
-                                  setSelectedFirstIdFilterArray(selectedFirstIdFilterArray.concat(first.id))
-                                } else{
-                                  setSelectedFirstIdFilterArray(selectedFirstIdFilterArray.filter(id => id !== first.id))
-                                }
-                              }}
-                            />
-                            <label htmlFor={`first${first.id}`}>
-                              <span className={`mark first${first.id}`} />
-                              <p>{first.name}</p>
-                            </label>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="popover card category_first"
+                      >
+                        <div className="flex ai-c">
+                          {cateogryList.map((first, fIndex) => (
+                            <div className="checkbox_field" key={`first${fIndex}`}>
+                              <input type="checkbox" id={`first${first.id}`} name="type"
+                                checked={selectedFirstFilterArray.includes(first.id)}
+                                onChange={e => {
+                                  if(e.target.checked){
+                                    setSelectedFirstFilterArray(selectedFirstFilterArray.concat(first.id))
+                                  } else{
+                                    setSelectedFirstFilterArray(selectedFirstFilterArray.filter(id => id != first.id))
+                                  }
+                                }}
+                              />
+                              <label htmlFor={`first${first.id}`}>
+                                <span className={`mark first${first.id}`} />
+                                <p>{first.name}</p>
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="group_btn">
+                          <button className="contained gray"
+                            onClick={() => {
+                              setSelectedFirstFilterArray(cateogryList.map(v => v.id));
+                            }}
+                          >초기화</button>
+                          <button className="contained main"
+                            onClick={() => {
+                              setFilteredHistoryList(historyList.filter(v => {
+                                return selectedFirstFilterArray.includes(v.firstCategoryId)
+                              }))
+
+                              // setSelectedSecondFilterArray(
+                              //   selectedSecondFilterArray
+                              // )
+
+
+                              // let allSecondCategoryArray: number[] = []
+                              // cateogryList.forEach(v => {
+                              //   allSecondCategoryArray = allSecondCategoryArray.concat(v.secondCategoryList.map(v => v.id))
+                              // })
+                              // setSelectedSecondFilterArray(allSecondCategoryArray)
+                              filter.isShowPopover = false
+                            }}
+                          >필터 적용</button>
+                        </div>
+                      </div>
                     )}
 
-                    {false && (
-                      <>
-                        {filter.name === '1차' && (
-                          <div className="popover card category_second">
-                            {/* {selectableSecondFilterArray.map((first, fIndex) => (
-                              <div className="group_area" key={`first${fIndex}`}>
-                                <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name}</p>
-                                <ul className="check_list flex ai-c flex-wrap">
-                                  {first.secondCategoryList.map((second, sIndex) => (
-                                    <li className="checkbox_field" key={`second${sIndex}`}>
-                                      <input type="checkbox" id={`${second.firstCategoryId}second${second.id}`} name="type"
-                                        checked={selectedSecondIdFilterArray.includes(second.id)}
-                                        onChange={e => {
-                                          if(e.target.checked) {
-                                            setSelectedSecondIdFilterArray(selectedSecondIdFilterArray.concat(second.id))
-                                          } else{
-                                            setSelectedSecondIdFilterArray(selectedSecondIdFilterArray.filter(id => id !== second.id))
-                                          }
-                                        }}
-                                      />
-                                      <label htmlFor={`${second.firstCategoryId}second${second.id}`}>
-                                        <span className="mark" />
-                                        <p>{second.name}</p>
-                                      </label>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))} */}
+                    {filter.name === '1차' && (
+                      <div className="popover card category_second">
+                        {cateogryList.filter(first => {
+                          if(!selectedFirstFilterArray.includes(first.id)) return false;
 
-                            {/* {cateogryList.filter(first => {
-                              return selectedFirstIdFilterArray.includes(first.id)
-                            }).map((first, fIndex) => (
-                              <div className="group_area" key={`first${fIndex}`}>
-                                <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name}</p>
-                                {first.secondCategoryList.map((second, sIndex) => (
-                                  <p key={`second${sIndex}`}>{second.name}</p>
-                                ))}
-                              </div>
-                            ))} */}
+                          if(first.secondCategoryList.length === 0) return false;
 
-                            {/* {cateogryList.filter(first => {
-                              if(!selectedFirstFilterArray.includes(first.id)) return false;
-                              if(first.secondCategoryList.length === 0) return false;
-                              return true
-                            }).map((first, fIndex) => (
-                              <div className="group_area" key={`first${fIndex}`}>
-                                <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name}</p>
-                                
-                              </div>
-                            ))} */}
+                          return true
+                        }).map((first, fIndex) => (
+                          <div className="group_area" key={`first${fIndex}`}>
+                            <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name}</p>
+                            <ul className="check_list flex ai-c flex-wrap">
+                              {first.secondCategoryList.map((second, sIndex) => (
+                                <li className="checkbox_field" key={`second${sIndex}`}>
+                                  <input type="checkbox" id={`${second.firstCategoryId}second${second.id}`} name="type"
+                                    checked={selectedSecondFilterArray.includes(second.id)}
+                                    onChange={e => {
+                                      if(e.target.checked) {
+                                        setSelectedSecondFilterArray(selectedSecondFilterArray.concat(second.id))
+                                      } else{
+                                        setSelectedSecondFilterArray(selectedSecondFilterArray.filter(id => id != second.id))
+                                      }
+                                    }}
+                                  />
+                                  <label htmlFor={`${second.firstCategoryId}second${second.id}`}>
+                                    <span className="mark" />
+                                    <p>{second.name}</p>
+                                  </label>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                        )}
+                        ))}
+
+                        <div className="group_btn">
+                          <button className="contained gray"
+                            onClick={() => {
+                              let allSecondCategoryArray: number[] = []
+                              cateogryList.forEach(v => {
+                                allSecondCategoryArray = allSecondCategoryArray.concat(v.secondCategoryList.map(v => v.id))
+                              })
+                              setSelectedSecondFilterArray(allSecondCategoryArray)
+                            }}
+                          >초기화</button>
+                          <button className="contained main"
+                            onClick={() => {
+                              setFilteredHistoryList(filteredHistoryList.filter(v => {
+                                return selectedSecondFilterArray.includes(v.secondCategoryId)
+                              }))
+                              filter.isShowPopover = false
+                            }}
+                          >필터 적용</button>
+                        </div>
+                      </div>
+                    )}
 
                     {filter.name === '2차' && (
                       <div className="popover card category_third">
-                        {/* {cateogryList.filter(first => {
+                        {cateogryList.filter(first => {
                           if(!selectedFirstFilterArray.includes(first.id)) return false;
 
                           if(first.secondCategoryList.length === 0) return false;
@@ -412,7 +401,7 @@ export default function ListView() {
                             //   <p>{third.name}</p>
                             // ))
                           ))
-                        ))} */}
+                        ))}
 
                         {/* .map((first, fIndex) => (
                           first.secondCategoryList.filter(second => {
@@ -456,27 +445,40 @@ export default function ListView() {
                         </div>
                       </div>
                     )}
-                      </>
-                    )}
 
                     {filter.name === '결제수단' && (
-                      <div className="popover card">
-                        {/* {cateogryList.map((first, fIndex) => (
-                          <div className="checkbox_field" key={`first${fIndex}`}>
-                            <input type="checkbox" id={`first${first.id}`} name="type"
-                              // checked={selectedFirstCateogry?.id === first.id}
-                              // onChange={e => {
-                              //   if(e.target.checked){
-                              //     setSelectedFirstCategory(first);
-                              //   }
-                              // }}
-                            />
-                            <label htmlFor={`first${first.id}`}>
-                              <span className={`mark first${first.id}`} />
-                              <p>{first.name}</p>
-                            </label>
-                          </div>
-                        ))} */}
+                      <div className="popover card category_first"
+                        // ref={popoverRef}
+                      >
+                        <div className="flex ai-c">
+                          {/* {cateogryList.map((first, fIndex) => (
+                            <div className="checkbox_field" key={`first${fIndex}`}>
+                              <input type="checkbox" id={`first${first.id}`} name="type"
+                                // checked={selectedFirstCateogry?.id === first.id}
+                                // onChange={e => {
+                                //   if(e.target.checked){
+                                //     setSelectedFirstCategory(first);
+                                //   }
+                                // }}
+                              />
+                              <label htmlFor={`first${first.id}`}>
+                                <span className={`mark first${first.id}`} />
+                                <p>{first.name}</p>
+                              </label>
+                            </div>
+                          ))} */}
+                        </div>
+
+                        <div className="group_btn">
+                          <button className="contained gray"
+                            onClick={() => {}}
+                          >초기화</button>
+                          <button className="contained main"
+                            onClick={() => {
+                              filter.isShowPopover = false
+                            }}
+                          >필터 적용</button>
+                        </div>
                       </div>
                     )}
                   </>
@@ -487,14 +489,7 @@ export default function ListView() {
           <button
             type="button"
             className="contained main add_history"
-            onClick={() => {
-              setShowEditHistoryModal(true)
-              setFilterList(filterList.map(v => {
-                v.isShowPopover = false
-
-                return v
-              }))
-            }}
+            onClick={() => setShowEditHistoryModal(true)}
           >내역 추가</button>
         </div>
         
@@ -505,12 +500,11 @@ export default function ListView() {
                 <th className="date">일자</th>
                 <th>내용</th>
                 <th className="price">금액</th>
-                <th className="first">거래유형</th>
-                <th className="second">1차</th>
-                <th className="third">2차</th>
+                <th>거래유형</th>
+                <th>1차</th>
+                <th>2차</th>
                 {/* <th>태그</th> */}
-                <th className="payment_method">결제수단</th>
-                <th className="receipt">영수증</th>
+                <th>결제수단</th>
                 <th className="action"></th>
               </tr>
             </thead>
@@ -529,9 +523,8 @@ export default function ListView() {
                   <td>{history.firstCategory?.name}</td>
                   <td>{history.secondCategory?.name}</td>
                   <td>{history.thirdCategory?.name}</td>
-                  {/* <td>{}</td> */}
+                  {/* <td></td> */}
                   <td>{history.paymentMethod?.name}</td>
-                  <td>{history.imageList.length}</td>
                   <td>
                     <div className="flex">
                       <button type="button"
@@ -623,9 +616,9 @@ const Container = styled.div`
 
     &.filter_add{
       padding: 24px 0;
-      li.filter_group{
+      .filter_group{
         padding-right: 24px;
-        &_item{
+        &_item  {
           position: relative;
           > button{
             height: 36px;
@@ -638,36 +631,41 @@ const Container = styled.div`
             }
           }
 
-          .popover.card{
-            min-width: 288px;
-            max-width: 360px;
-              &.category_first{
-                box-shadow: rgba(34, 34, 34, 0.2) 6px 6px 12px 6px;
+          .popover.card.category{
+            &_first{
+              .checkbox_field + .checkbox_field{
+                margin-left: 24px;
               }
+            }
 
-              &.category_second{
-                .group_area{
-                  > .fs12{
-                    margin-bottom: 6px;
-                  }
-                
-                  + .group_area{
-                    margin-top: 24px;
-                  }
+            &_second, &_third{
+              .group_area{
+                > .fs12{
+                  margin-bottom: 6px;
+                }
+                + .group_area{
+                  margin-top: 24px;
                 }
               }
+            }
 
-              &.category_second{
-                .checkbox_field{
-                  width: 50%;
-                  &:nth-child(odd){
-                    padding-right: 12px;
-                  }
-                  &:nth-child(2) ~ .checkbox_field{
+            &_second{
+              .check_list{
+                width: 260px;
+              }
+              .checkbox_field{
+                width: 120px;
+                &:nth-child(even){
+                  margin-left: 20px;
+                  ~ li.checkbox_field{
                     margin-top: 6px;
                   }
                 }
               }
+            }
+
+            &_third{
+            }
           }
 
           + li{
@@ -687,17 +685,8 @@ const Container = styled.div`
       th{
         padding: 12px;
         text-align: left;
-        &.date, &.price, &.second, &.third{
+        &.date, &.price{
           width: 120px;
-        }
-        &.first{
-          width: 80px;
-        }
-        &.payment_method{
-          width: 180px;
-        }
-        &.receipt{
-          /* width: ; */
         }
         &.action{
           width: 96px;

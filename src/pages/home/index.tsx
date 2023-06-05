@@ -157,7 +157,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <p className="member">보라돌이, 뚜비, 나나, 뽀</p>
+              {/* <p className="member">보라돌이, 뚜비, 나나, 뽀</p> */}
             </div>
           </li>
         ))}
