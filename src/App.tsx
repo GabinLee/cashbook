@@ -26,10 +26,20 @@ function App() {
     if(token === undefined) return
 
     if(token === null || token === '') {
+      console.log('token1', token)
+      console.log('locaion1', location.pathname)
       navigate('/sign-in')
     } else {
-      if(location.pathname === '/' || location.pathname === '/sign-in') navigate('/')
-      else navigate(`${location.pathname}`)
+      if(location.pathname === '/' || location.pathname === '/sign-in') {
+        console.log('token2', token)
+        console.log('locaion2', location.pathname)
+        navigate('/')
+      }
+      else {
+        console.log('token3', token)
+        console.log('locaion3', location.pathname)
+        navigate(`${location.pathname}`)
+      }
     }
 
   }, [tokenRef.current])
