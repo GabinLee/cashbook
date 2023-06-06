@@ -38,6 +38,7 @@ export default function SignInPage() {
       if(response.data.success){
         localStorage.setItem('token', response.data.data.token)
 
+        navigate('/')
         getUser()
       } else{
         alert('error')
@@ -61,7 +62,7 @@ export default function SignInPage() {
       if(response.data.success){
         localStorage.setItem('user', JSON.stringify(response.data.data))
 
-        navigate('/')
+        // navigate('/')
       } else{
         alert('error')
       }
@@ -79,7 +80,7 @@ export default function SignInPage() {
   return (
     <Container className="sign-in flex">
       <div className="cont shadow">
-        <h5>로그인</h5>
+        <h5>Cashbook 로그인</h5>
         
         <button
           type="button"

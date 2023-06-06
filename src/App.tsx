@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import './style/reset.scss';
 import './style/global.scss';
 import SignInPage from "./pages/signIn";
@@ -7,29 +7,45 @@ import MainPage from "./pages/main";
 import HomePage from "./pages/home";
 import CashBookPage from "./pages/cashbook";
 import SettingsPage from "./pages/settings";
+import axios from "axios";
 
 
 function App() {
+  const tokenRef = useRef('')
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
-    // const token = localStorage.getItem('token')
-    // console.log('토큰', token)
+    tokenRef.current = localStorage.getItem('token') ?? ''
+
   }, [])
+
+  useEffect(() => {
+    const token = tokenRef.current
+    
+    if(token === undefined) return
+
+    if(token === null || token === '') {
+      navigate('/sign-in')
+    } else {
+      if(location.pathname === '/' || location.pathname === '/sign-in') navigate('/')
+      else navigate(`${location.pathname}`)
+    }
+
+  }, [tokenRef.current])
 
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="sign-in" element={<SignInPage />} />
+    <Routes>
+      <Route path="sign-in" element={<SignInPage />} />
 
-        <Route path="" element={<MainPage />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/:id" element={<CashBookPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          
-        </Route>
-      </Routes>
-    </BrowserRouter>
+      <Route path="" element={<MainPage />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/:id" element={<CashBookPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        
+      </Route>
+    </Routes>
   );
 }
 

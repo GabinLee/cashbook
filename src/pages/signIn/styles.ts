@@ -15,7 +15,7 @@ export const Container = styled.section`
     backdrop-filter: blur(10px);
 
     h5{
-      margin-bottom: 24px;
+      margin-bottom: 36px;
       color: white;
       text-align: center;
     }

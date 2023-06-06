@@ -57,6 +57,10 @@ export const Container = styled.div`
     background-color: ${Colors.gray_e5};
     height: 60px;
     padding: 18px 24px;
+    button{
+      background-color: transparent;
+      color: ${Colors.gray_5};
+    }
   }
 
   main{

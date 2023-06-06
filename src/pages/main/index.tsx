@@ -19,6 +19,7 @@ export default function MainPage() {
 
   useEffect(() => {
     tokenRef.current = localStorage.getItem('token') ?? ''
+
     
     if(localStorage.getItem('user') !==  null){
       const user = JSON.parse(`${localStorage.getItem('user')}`)
@@ -27,8 +28,10 @@ export default function MainPage() {
       setUserSocialId(user.socialId)
     }
 
-    getCashbookList()
-    getUser()
+    if(tokenRef.current !== '' && tokenRef.current !== null){
+      getCashbookList()
+      getUser()
+    }
   }, [])
 
 
@@ -40,7 +43,6 @@ export default function MainPage() {
     })
     .then(response => {
       if(response.data.success){
-        // console.log('getCashbookList', response.data.data)
 
         setNavCashbookList(response.data.data)
 
@@ -62,12 +64,15 @@ export default function MainPage() {
 
         setUserNickname(response.data.data.nickname)
         setUserSocialId(response.data.data.socialId)
-
-        // localStorage.setItem('user', JSON.stringify(response.data.data));
       } else{
         alert('error')
       }
     }).catch(error => console.log(error))
+  }
+
+  const signout = () => {
+    localStorage.removeItem('token')
+    navigate('/sign-in')
   }
 
 
@@ -149,8 +154,11 @@ export default function MainPage() {
           ))} */}
         </nav>
 
-        <section className="profile">
-          <p>{userNickname}</p>
+        <section className="profile flex ai-c">
+          <p className="flex1">{userNickname}</p>
+          <button className="fs12"
+            onClick={() => signout()}
+          >로그아웃</button>
         </section>
       </div>
 

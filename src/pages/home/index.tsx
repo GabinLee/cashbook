@@ -21,7 +21,9 @@ export default function HomePage() {
     
     console.log('홈 - 토큰ref', tokenRef.current)
 
-    getCashbookList()
+    if(tokenRef.current !== '' && tokenRef.current !== null) {
+      getCashbookList()
+    }
   }, [])
 
   const getCashbookList = () => {
