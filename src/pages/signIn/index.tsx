@@ -71,8 +71,8 @@ export default function SignInPage() {
 
   const onClickLoginKakao = ()  => {
     console.log('onClickLoginKakao')
-    const REST_API_KEY = '7d3c474a3890053d011b65f24f038eb1';
-    const REDIRECT_URI =  `http://cashbook-api-stage.jollybeen.com/sign-in?type=kakao`;
+    const REST_API_KEY = '67a2cfcec81c116238e7fd3459c119e8';
+    const REDIRECT_URI =  `https://prismatic-puffpuff-29115a.netlify.app/sign-in?type=kakao`;
     
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`
   }
