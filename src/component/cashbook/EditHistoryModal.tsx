@@ -88,18 +88,39 @@ export default function EditHistoryModal(props: EditHistory) {
     }).catch(error => console.log(error))
   }
 
-  const editHistory = () => {
-    if(!props.cashbookHistory) return
+//   수정에서는
 
-    axios.patch(`${process.env.REACT_APP_HOST_URL}v1/cash-book-detail/${props.cashbookHistory.id}`, {
-      date: date,
-      description: description,
-      price: price,
-      firstCategoryId: selectedFirstCateogry?.id,
-      secondCategoryId: selectedSecondCategory?.id,
-      thirdCategoryId: selectedThirdCategory?.id,
-      paymentMethodId: selectedPaymentMethod?.id
-    }, {
+// 똑같이 images 에 파일 넣으면 대구 
+
+// 삭제할 이미지는
+
+// deleteImageIds  라는 필드에 int 배열로 넣어서 주면 돼 ㅎㅎ
+
+  const editHistory = () => {
+    if(!props.cashbookHistory || selectedFirstCateogry === null) return
+
+    const formData = new FormData();
+    formData.append('date', date)
+    formData.append('description', description)
+    formData.append('price', `${price}`)
+    formData.append('firstCategoryId', `${selectedFirstCateogry.id}`)
+    if(selectedSecondCategory !== null) {
+      formData.append('secondCategoryId', `${selectedSecondCategory.id}`)
+    }
+    if(selectedThirdCategory !== null) {
+      formData.append('thirdCategoryId', `${selectedThirdCategory.id}`)
+    }
+    if(selectedPaymentMethod !== null) {
+      formData.append('paymentMethodId', `${selectedPaymentMethod.id}`)
+    }
+    
+    if(selectedReceiptImage !== null){
+      selectedReceiptImage.map((img) => (
+        formData.append('images', img)
+      ))
+    }
+
+    axios.patch(`${process.env.REACT_APP_HOST_URL}v1/cash-book-detail/${props.cashbookHistory.id}`, formData, {
       headers: {
         Authorization: `Bearer ${tokenRef.current}`
       }
@@ -271,23 +292,20 @@ export default function EditHistoryModal(props: EditHistory) {
             />
             <label htmlFor="receipt_img" className="add_img"/>
           </div>
-          <div className="img_list flex ai-s">
-            {(receiptImgae !== null && selectedReceiptImage === null) && (
-              <>
-              {receiptImgae.map((img, index) => (
-                <img src={`${process.env.REACT_APP_IMAGE_URL}receipt/${img.image}`} alt="영수증" key={`img${index}`} />
-              ))}
-              </>
-            )}
-            
-            {selectedReceiptImage !== null && (
-              <>
-              {selectedReceiptImage.map((img, index) => (
-                <img src={URL.createObjectURL(img)} alt="영수증" key={`img${index}`} />
-              ))}
-              </>
-            )}
-          </div>
+          <ul className="img_list flex ai-s">
+            {selectedReceiptImage !== null && selectedReceiptImage.map((img, index) => (
+              <li key={`img${index}`}>
+                <img src={URL.createObjectURL(img)} alt="영수증1" />
+                <button className="btn clear"></button>
+              </li>
+            ))}
+            {receiptImgae !== null && receiptImgae.map((img, index) => (
+              <li key={`img${index}`}>
+                <img src={`${process.env.REACT_APP_IMAGE_URL}receipt/${img.image}`} alt="영수증2" />
+                <button className="btn clear"></button>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="card_bottom">
@@ -381,11 +399,19 @@ const Container = styled.div`
           margin-left: -24px;
           padding: 12px 12px 0 84px;
           overflow: auto;
-          img{
-            width: 60px;
-            min-width: 60px;
-            height: 90px;
+          li{
             margin-right: 12px;
+            position: relative;
+            img{
+              width: 60px;
+              min-width: 60px;
+              height: 90px;
+            }
+            .btn.clear{
+              position: absolute;
+              top: 0;
+              right: 0;
+            }
           }
         }
       }

@@ -531,7 +531,14 @@ export default function ListView() {
                   <td>{history.thirdCategory?.name}</td>
                   {/* <td>{}</td> */}
                   <td>{history.paymentMethod?.name}</td>
-                  <td>{history.imageList.length}</td>
+                  <td className="flex ai-c">
+                    {history.imageList.map((img, index) => index === 0 && (
+                      <img src={`${process.env.REACT_APP_IMAGE_URL}receipt/${img.image}`} alt="영수증" key={`img${index}`} />
+                    ))}
+                    {history.imageList.length > 1 && (
+                      <p className="fs12">+ {history.imageList.length - 1}</p>
+                    )}
+                  </td>
                   <td>
                     <div className="flex">
                       <button type="button"
@@ -719,6 +726,13 @@ const Container = styled.div`
           td{
             .btn.delete{
               margin-left: 12px;
+            }
+
+            img{
+              height: 30px;
+              + p{
+                padding-left: 6px;
+              }
             }
           }
         }
