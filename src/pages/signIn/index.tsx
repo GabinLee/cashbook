@@ -62,7 +62,6 @@ export default function SignInPage() {
       if(response.data.success){
         localStorage.setItem('user', JSON.stringify(response.data.data))
 
-        // navigate('/')
       } else{
         alert('error')
       }
@@ -72,7 +71,7 @@ export default function SignInPage() {
   const onClickLoginKakao = ()  => {
     console.log('onClickLoginKakao')
     const REST_API_KEY = '67a2cfcec81c116238e7fd3459c119e8';
-    const REDIRECT_URI =  `https://prismatic-puffpuff-29115a.netlify.app/sign-in?type=kakao`;
+    const REDIRECT_URI = `https://prismatic-puffpuff-29115a.netlify.app/sign-in?type=kakao`;
     
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`
   }
