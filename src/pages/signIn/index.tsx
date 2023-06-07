@@ -1,19 +1,10 @@
-// import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container } from "./styles";
 import { useEffect } from "react";
 import axios from "axios";
-// import SignUpModal from "../../component/SignUpModal";
 
 
 export default function SignInPage() {
-  // const [userId, setUserId] = useState('')
-  // const [password, setPassword] = useState('')
-
-  // const [showSignUp, setShowSignUp] = useState(false)
-
-  // const isValidSignIn = !(userId && password)
-
   const navigate = useNavigate()
 
   const [searchParams, setSearchParams] = useSearchParams()
