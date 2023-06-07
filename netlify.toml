@@ -1,5 +1,5 @@
 [[redirects]]
 from = "/proxy/*"
-to = "http://cashbook-api-stage.jollybeen.com/*"
+to = "http://cashbook-api-stage.jollybeen.com/:splat"
 status = 200
 force = true
