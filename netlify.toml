@@ -1,0 +1,5 @@
+[[redirects]]
+from = "/proxy/*"
+to = "http://cashbook-api-stage.jollybeen.com/*"
+status = 200
+force = true
