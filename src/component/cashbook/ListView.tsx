@@ -465,7 +465,7 @@ export default function ListView() {
 
                     {filter.name === '결제수단' && (
                       <ul className="popover card payment_method">
-                        <li className="checkbox_field">
+                        {/* <li className="checkbox_field">
                           <input type="checkbox" id="payment_all" name="type"
                             checked={selectedPaymentMethodIdArray === paymentMethodList.map(v => v.id)}
                             onChange={e => {
@@ -480,7 +480,7 @@ export default function ListView() {
                             <span className="mark" />
                             <p>전체</p>
                           </label>
-                        </li>
+                        </li> */}
                         {paymentMethodList.map((payment, pIndex) => (
                           <li className="checkbox_field" key={`payment${pIndex}`}>
                             <input type="checkbox" id={`payment${payment.id}`} name="type"
