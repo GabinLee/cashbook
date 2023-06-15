@@ -88,22 +88,25 @@ export default function CashbookHome() {
       </div>
 
       <ul className="group_card">
-        <li className="card income">
+        <li className="card expense">
           <div className="card_top">
-            <p>이달의 수입 현황</p>
-            <h5>{addComma(totalIncome)}</h5>
+            <p>이달의 지출 현황</p>
+            <h5>{addComma(totalExpense)}</h5>
           </div>
           <ul className="card_bottom">
-            {incomeList.length === 0 && (
-              <li>수입 내역이 없습니다.</li>
+            {expenseList.length === 0 && (
+              <li>지출 내역이 없습니다.</li>
             )}
-            {incomeList.map((income, index) => (
-              <li key={`income${index}`} className="flex ai-c">
-                <p>{moment(income.date).format('DD')}일</p>
-                <p className="flex1">{income.description}</p>
-                <p>{addComma(income.price)}원</p>
+            {expenseList.map((expense, index) => index < 10 && (
+              <li key={`expense${index}`} className="flex ai-c">
+                <p>{moment(expense.date).format('DD')}일</p>
+                <p className="flex1">{expense.description}</p>
+                <p>{addComma(expense.price)}원</p>
               </li>
             ))}
+            {expenseList.length > 9 && (
+              <li className="flex-c more">⋮</li>
+            )}
           </ul>
         </li>
 
@@ -126,25 +129,22 @@ export default function CashbookHome() {
           </ul>
         </li>
 
-        <li className="card expense">
+        <li className="card income">
           <div className="card_top">
-            <p>이달의 지출 현황</p>
-            <h5>{addComma(totalExpense)}</h5>
+            <p>이달의 수입 현황</p>
+            <h5>{addComma(totalIncome)}</h5>
           </div>
           <ul className="card_bottom">
-            {expenseList.length === 0 && (
-              <li>지출 내역이 없습니다.</li>
+            {incomeList.length === 0 && (
+              <li>수입 내역이 없습니다.</li>
             )}
-            {expenseList.map((expense, index) => index < 10 && (
-              <li key={`expense${index}`} className="flex ai-c">
-                <p>{moment(expense.date).format('DD')}일</p>
-                <p className="flex1">{expense.description}</p>
-                <p>{addComma(expense.price)}원</p>
+            {incomeList.map((income, index) => (
+              <li key={`income${index}`} className="flex ai-c">
+                <p>{moment(income.date).format('DD')}일</p>
+                <p className="flex1">{income.description}</p>
+                <p>{addComma(income.price)}원</p>
               </li>
             ))}
-            {expenseList.length > 9 && (
-              <li className="flex-c more">⋮</li>
-            )}
           </ul>
         </li>
       </ul>

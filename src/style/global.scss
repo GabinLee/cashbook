@@ -462,10 +462,9 @@ input[type="checkbox"] {
   &:not(.card){
     position: relative;
   }
-  .btn.more{
+  .btn_ic.more{
     width: 100%;
     height: 100%;
-    border-radius: 50%;
   }
   &_menu, &.card{
     border-radius: 12px;
@@ -541,22 +540,45 @@ input[type="checkbox"] {
 }
 
 .btn{
-  &.edit{
-    width: 30px;
-    height: 30px;
+  &_ic{
     border-radius: 50%;
-    background: var(--gray_f5) url(../../public/images/edit.svg) no-repeat center center / 14px 14px;
-    &:hover{
-      background-color: var(--gray_e);
+    &.edit{
+      width: 30px;
+      height: 30px;
+      background: var(--gray_f5) url(../../public/images/edit.svg) no-repeat center center / 14px 14px;
+      &:hover{
+        background-color: var(--gray_e);
+      }
+    }
+    &.delete{
+      width: 30px;
+      height: 30px;
+      background: var(--gray_f5) url(../../public/images/delete.svg) no-repeat center center / 14px 14px;
+      &:hover{
+        background-color: var(--gray_e);
+      }
+    }
+
+    &.clear{
+      &:not(.dark){
+        background: rgba(255, 255, 255, 0.5) url(../../public/images/clear.svg) no-repeat center center / 10px 10px;
+        &:hover{
+          background-color: var(--gray_e);
+        }
+      }
     }
   }
-  &.delete{
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: var(--gray_f5) url(../../public/images/delete.svg) no-repeat center center / 14px 14px;
-    &:hover{
-      background-color: var(--gray_e);
+  
+
+  &20{
+    width: 20px;
+    height: 20px;
+
+    &.clear.dark{
+      background: #222 url(../../public/images/clear_white.svg) no-repeat center center / 8px 8px;
+      &:hover{
+        background-color: var(--gray_5);
+      }
     }
   }
 }

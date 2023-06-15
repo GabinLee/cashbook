@@ -19,9 +19,8 @@ export default function MainPage() {
 
   useEffect(() => {
     tokenRef.current = localStorage.getItem('token') ?? ''
-
     
-    if(localStorage.getItem('user') !==  null){
+    if(localStorage.getItem('user') !==  null && localStorage.getItem('user') !== ''){
       const user = JSON.parse(`${localStorage.getItem('user')}`)
 
       setUserNickname(user.nickname)
@@ -60,8 +59,6 @@ export default function MainPage() {
     })
     .then(response => {
       if(response.data.success){
-        // console.log('getUser 성공', response.data.data)
-
         setUserNickname(response.data.data.nickname)
         setUserSocialId(response.data.data.socialId)
       } else{
@@ -71,8 +68,6 @@ export default function MainPage() {
   }
 
   const signout = () => {
-    localStorage.removeItem('token')
-    navigate('/sign-in')
   }
 
 
@@ -86,6 +81,7 @@ export default function MainPage() {
             <img src="images/logo_white.svg" alt="로고 이미지" />
           </button>
         </header>
+
 
         <nav>
           {navCashbookList.map((navCashbook, nIndex) => (
@@ -153,6 +149,7 @@ export default function MainPage() {
             </button>
           ))} */}
         </nav>
+        
 
         <section className="profile flex ai-c">
           <p className="flex1">{userNickname}</p>

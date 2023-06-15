@@ -173,7 +173,7 @@ export default function SettingsView() {
                       <div className="first flex ai-c">
                         <p className="flex1">{secondItem.name}</p>
                         <div className="popover">
-                          <button type="button" className="btn more"
+                          <button type="button" className="btn_ic more"
                             onClick={() => {
                               setCategoryList(cateogryList.map(first => {
                                 if(first.id === firstItem.id) {
@@ -245,7 +245,7 @@ export default function SettingsView() {
                       </div>
                       <ul className="second flex ai-c">
                         <li>
-                          <button type="button" className="btn add"
+                          <button type="button" className="btn_ic add"
                             onClick={() => {
                               setShowEditThirdCategoryModal(true)
                               setSelectedFirst(firstItem)
@@ -257,7 +257,7 @@ export default function SettingsView() {
                           <li className="flex ai-c" key={`thirdItem ${tIndex}`}>
                             <p>{thirdItem.name}</p>
                             <div className="popover">
-                              <button type="button" className="btn more"
+                              <button type="button" className="btn_ic more"
                                 onClick={() => {
                                   setCategoryList(cateogryList.map(first => {
                                     (first.id === firstItem.id) && (
@@ -325,7 +325,7 @@ export default function SettingsView() {
                   ))}
 
                   <li>
-                    <button type="button" className="btn add"
+                    <button type="button" className="btn_ic add"
                       onClick={() => {
                         setShowEditSecondCategoryModal(true)
                         setSelectedFirst(firstItem)
@@ -345,7 +345,7 @@ export default function SettingsView() {
           </div>
 
           <div className="card_cont">
-            <button type="button" className="btn add"
+            <button type="button" className="btn_ic add"
               onClick={() => {
                 setShowEditPaymentMethodModal(true)
               }}
@@ -358,13 +358,13 @@ export default function SettingsView() {
                       <span>{method.name}</span>
                       {(method.type === 0) && <span>({method.paymentDay}일)</span>}
                     </p>
-                    <button className="btn edit"
+                    <button className="btn_ic edit"
                       onClick={() => {
                         setShowEditPaymentMethodModal(true)
                         setSelectedPaymentMethod(method)
                       }}
                     ></button>
-                    <button className="btn delete"
+                    <button className="btn_ic delete"
                       onClick={() => deletePaymentMethod(method.id)}
                     ></button>
                   </div>
@@ -439,7 +439,7 @@ const Container = styled.div`
       margin-top: 24px;
     }
 
-    .btn{
+    .btn_ic{
       &.more{
         background: url(images/more.svg) no-repeat center center / 12px 12px;
         &:hover{
@@ -450,7 +450,6 @@ const Container = styled.div`
       &.add{
         width: 30px;
         height: 30px;
-        border-radius: 50%;
         background: url(images/add.svg) no-repeat center center / 14px 14px;
         &:hover{
           background-color: ${Colors.gray_e5};
@@ -545,7 +544,7 @@ const Container = styled.div`
                       .popover{
                         width: 28px;
                         height: 24px;
-                        .btn.more{
+                        .btn_ic.more{
                           background: url(images/more.svg) no-repeat center center / 12px 12px;
                           &:hover{
                             background: white url(images/more.svg) no-repeat center center / 12px 12px;
@@ -579,7 +578,7 @@ const Container = styled.div`
               padding-right: 24px;
               white-space: nowrap;
             }
-            .btn.edit{
+            .btn_ic.edit{
               margin-right: 6px;
             }
           }

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import './style/reset.scss';
 import './style/global.scss';
@@ -7,7 +7,6 @@ import MainPage from "./pages/main";
 import HomePage from "./pages/home";
 import CashBookPage from "./pages/cashbook";
 import SettingsPage from "./pages/settings";
-import axios from "axios";
 
 
 function App() {
@@ -25,22 +24,16 @@ function App() {
     
     if(token === undefined) return
 
-    // if(token === null || token === '') {
-    //   // console.log('token1', token)
-    //   // console.log('locaion1', location.pathname)
-    //   navigate('/sign-in')
-    // } else {
-    //   if(location.pathname === '/' || location.pathname === '/sign-in') {
-    //     // console.log('token2', token)
-    //     // console.log('locaion2', location.pathname)
-    //     navigate('/')
-    //   }
-    //   else {
-    //     // console.log('token3', token)
-    //     // console.log('locaion3', location.pathname)
-    //     navigate(`${location.pathname}`)
-    //   }
-    // }
+    if(token === null || token === '') {
+      navigate('/sign-in')
+    } else {
+      if(location.pathname === '/' || location.pathname === '/sign-in') {
+        navigate('/')
+      }
+      else {
+        navigate(`${location.pathname}`)
+      }
+    }
 
   }, [tokenRef.current])
 

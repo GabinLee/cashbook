@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom"
 import FirstCategory, { SecondCategory, ThirdCategory } from "../../models/Category.model"
 import PaymentMethod from "../../models/PaymentMethod.model"
 import { Colors } from "../../style/Styles"
+import { addComma } from "../../utils/utils"
 
 type EditHistory = {
   cashbookHistory?: CashbookHistory
@@ -26,13 +27,15 @@ export default function EditHistoryModal(props: EditHistory) {
   const [selectedFirstCateogry, setSelectedFirstCategory] = useState<FirstCategory|null>(props.cashbookHistory ? props.cashbookHistory.firstCategory : null)
   const [date, setDate] = useState(props.cashbookHistory ? moment(props.cashbookHistory.date).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'))
   const [description, setDescription] = useState(props.cashbookHistory ? props.cashbookHistory.description : '')
-  const [inputPrice, setInputPrice] = useState(props.cashbookHistory ? props.cashbookHistory.price : '')
+  const [inputPrice, setInputPrice] = useState(props.cashbookHistory ? props.cashbookHistory.price : 0)
   const [price, setPrice] = useState(props.cashbookHistory ? props.cashbookHistory.price : 0)
   const [selectedSecondCategory, setSelectedSecondCateogory] = useState<SecondCategory|null>(props.cashbookHistory ? props.cashbookHistory.secondCategory : null)
   const [selectedThirdCategory, setSelectedThirdCategory] = useState<ThirdCategory|null>(props.cashbookHistory ? props.cashbookHistory.thirdCategory : null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod|null>(props.cashbookHistory ? props.cashbookHistory.paymentMethod : null)
-  const [receiptImgae] = useState(props.cashbookHistory ? props.cashbookHistory.imageList : null)
+  const [receiptImage, setReceiptImage] = useState(props.cashbookHistory ? props.cashbookHistory.imageList : null)
   const [selectedReceiptImage, setSelectedReceiptImage] = useState<File[]|null>(null);
+
+  const [deleteImageIdArray, setDeleteImageIdArray] = useState<number[]>([])
   
   const isValidConfirm = !(description && price && selectedFirstCateogry)
 
@@ -47,8 +50,27 @@ export default function EditHistoryModal(props: EditHistory) {
     }
   }, [])
 
-  const addHistory = () => {
+  // useEffect(() => {
+  //   // setSelectedSecondCateogory(null)
+  //   // setSelectedThirdCategory(null)
 
+  //   console.log('selectedFirstCateogry', selectedFirstCateogry)
+  //   console.log('selectedSecondCategory', selectedSecondCategory)
+
+  //   if(selectedSecondCategory !== null){
+  //     setSelectedSecondCateogory(null)
+  //   }
+  // }, [selectedFirstCateogry])
+
+  // useEffect(() => {
+  //   // setSelectedThirdCategory(null)
+  //   console.log('selectedSecondCategory', selectedSecondCategory)
+  //   console.log('selectedThirdCategory', selectedThirdCategory)
+  // }, [selectedSecondCategory])
+
+
+
+  const addHistory = () => {
     if(selectedFirstCateogry === null) return;
 
     const formData = new FormData();
@@ -88,14 +110,6 @@ export default function EditHistoryModal(props: EditHistory) {
     }).catch(error => console.log(error))
   }
 
-//   수정에서는
-
-// 똑같이 images 에 파일 넣으면 대구 
-
-// 삭제할 이미지는
-
-// deleteImageIds  라는 필드에 int 배열로 넣어서 주면 돼 ㅎㅎ
-
   const editHistory = () => {
     if(!props.cashbookHistory || selectedFirstCateogry === null) return
 
@@ -113,12 +127,13 @@ export default function EditHistoryModal(props: EditHistory) {
     if(selectedPaymentMethod !== null) {
       formData.append('paymentMethodId', `${selectedPaymentMethod.id}`)
     }
-    
     if(selectedReceiptImage !== null){
       selectedReceiptImage.map((img) => (
         formData.append('images', img)
       ))
     }
+
+    formData.append('deleteImageIds', JSON.stringify(deleteImageIdArray))
 
     axios.patch(`${process.env.REACT_APP_HOST_URL}v1/cash-book-detail/${props.cashbookHistory.id}`, formData, {
       headers: {
@@ -146,18 +161,13 @@ export default function EditHistoryModal(props: EditHistory) {
     setPrice(parseInt(value))
   }
 
+  // const deleteImage = (id:number) => {
+
+  // }
+
 
   return(
     <Container className="modal">
-
-        {/* <input
-            type="text"
-            placeholder="금액 입력"
-            onChange={(e) => onChangePoints(e)}
-            value={addComma(money) || ""}
-        /> */}
-
-
       <div className="card">
         <h6 className="card_top">내역 {props.cashbookHistory ? '수정' : '추가'}</h6>
 
@@ -200,7 +210,7 @@ export default function EditHistoryModal(props: EditHistory) {
           <div className="input_field flex ai-c">
             <p>금액</p>
             <input type="text"
-              value={inputPrice}
+              value={addComma(inputPrice)}
               onChange={onchangePrice}
             />
           </div>
@@ -295,14 +305,21 @@ export default function EditHistoryModal(props: EditHistory) {
           <ul className="img_list flex ai-s">
             {selectedReceiptImage !== null && selectedReceiptImage.map((img, index) => (
               <li key={`img${index}`}>
-                <img src={URL.createObjectURL(img)} alt="영수증1" />
-                <button className="btn clear"></button>
+                <img src={URL.createObjectURL(img)} alt="영수증" />
+                <button className="btn_ic btn20 clear dark"
+                  onClick={() => setSelectedReceiptImage(selectedReceiptImage.filter(v => v.name !== img.name))}
+                />
               </li>
             ))}
-            {receiptImgae !== null && receiptImgae.map((img, index) => (
+            {receiptImage !== null && receiptImage.map((img, index) => (
               <li key={`img${index}`}>
-                <img src={`${process.env.REACT_APP_IMAGE_URL}receipt/${img.image}`} alt="영수증2" />
-                <button className="btn clear"></button>
+                <img src={`${process.env.REACT_APP_IMAGE_URL}receipt/${img.image}`} alt="영수증2(server)" />
+                <button className="btn_ic btn20 clear dark"
+                  onClick={() => {
+                    setDeleteImageIdArray(deleteImageIdArray.concat(img.id))
+                    setReceiptImage(receiptImage.filter(v => v.id != img.id))
+                  }}
+                />
               </li>
             ))}
           </ul>
@@ -407,10 +424,10 @@ const Container = styled.div`
               min-width: 60px;
               height: 90px;
             }
-            .btn.clear{
+            .btn_ic.clear{
               position: absolute;
-              top: 0;
-              right: 0;
+              top: -4px;
+              right: -4px;
             }
           }
         }

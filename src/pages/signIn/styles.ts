@@ -4,7 +4,8 @@ import { Colors } from "../../style/Styles";
 export const Container = styled.section`
   width: 100%;
   height: 100vh;
-  background: linear-gradient(to right, ${Colors.blue}, ${Colors.purple});
+  /* background: linear-gradient(to right, ${Colors.blue}, ${Colors.purple}); */
+  background: url(/images/background_image.jpg) no-repeat center center / cover;
 
   .cont{
     margin: auto;

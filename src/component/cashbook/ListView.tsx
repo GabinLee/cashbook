@@ -36,11 +36,13 @@ export default function ListView() {
 
   const [filteredHistoryList, setFilteredHistoryList] = useState<CashbookHistory[]>([])
   
-  const [selectedFirstIdFilterArray, setSelectedFirstIdFilterArray] = useState<number[]>([])
+  const [selectedFirstIdArray, setSelectedFirstIdArray] = useState<number[]>([])
   // const [selectableSecondFilterArray, setSelectableSecondFilterArray] = useState<FirstCategory[]>([])
   // const [selectedSecondIdFilterArray, setSelectedSecondIdFilterArray] = useState <number[]>([])
   // const [selectableThirdFilterArray, setSelectableThirdFilterArray] = useState()
   // const [selectedThirdFilterArray, setSelectedThirdFilterArray] = useState<number[]>([])
+  const [selectedPaymentMethodIdArray, setSelectedPaymentMethodIdArray] = useState<number[]>([])
+
 
 
   useEffect(() => {
@@ -53,8 +55,8 @@ export default function ListView() {
     getHistory();
 
     setFilteredHistoryList(historyList.filter(v => moment(v.date).format('YYYY-MM') === month))
+    setMonth(moment().format('YYYY-MM'))
 
-    console.log('필터된 목록', filteredHistoryList)
   }, [id])
 
   useEffect(() => {
@@ -77,32 +79,38 @@ export default function ListView() {
     setTotalSaving(monthlySaving)
 
     // 거래유형 default
-    setSelectedFirstIdFilterArray(cateogryList.map(v => v.id))
+    setSelectedFirstIdArray(cateogryList.map(v => v.id))
+
+    // 결제수단 default
+    setSelectedPaymentMethodIdArray(paymentMethodList.map(v => v.id))
 
   }, [historyList, month])
 
+  // 월
   useEffect(() => {
     setFilteredHistoryList(historyList.filter(v => moment(v.date).format('YYYY-MM') === month))
-
   }, [month])
 
+  // 거래유형 체크여부에 따른 필터
   useEffect(() => {
     setFilteredHistoryList(historyList.filter(v => {
-      return selectedFirstIdFilterArray.includes(v.firstCategoryId)
+      return selectedFirstIdArray.includes(v.firstCategoryId)
     }))
-  }, [selectedFirstIdFilterArray])
+  }, [selectedFirstIdArray])
 
-
+  // 결제수단 체크여부에 따른 필터
+  useEffect(() => {
+    setFilteredHistoryList(historyList.filter(v => {
+      if(v.paymentMethod !== null){
+        return selectedPaymentMethodIdArray.includes(v.paymentMethod.id)
+      }
+    }))
+  }, [selectedPaymentMethodIdArray])
 
 
 
 
   // useEffect(() => {
-  //   // console.log('필터된 목록', filteredHistoryList)
-  //   // console.log('셀렉 가능 second', selectableSecondFilterArray)
-  //   // console.log('셀렉된 second', selectedSecondIdFilterArray)
-
-
   //   // 1차 default
   //   setSelectableSecondFilterArray(cateogryList.filter(first => {
   //     return selectedFirstIdFilterArray.includes(first.id)
@@ -138,8 +146,6 @@ export default function ListView() {
 
 
   //   // let abc: number[] = []
-    
-    
     
   //   // .forEach(v => {
   //   //   // abc = abc.concat(v.secondCategoryList.map(v => v.id))
@@ -185,8 +191,6 @@ export default function ListView() {
   //   //   return selectedFirstFilterArray.includes(v.firstCategoryId)
   //   // }))
     
-  //   // 2차 default
-
   // }, [selectedFirstIdFilterArray])
 
 
@@ -298,7 +302,7 @@ export default function ListView() {
 
         <div className="area filter_add flex">
           <ul className="flex1 flex flex-wrap filter_group">
-            {filterList.filter(v => v.name === '거래유형').map((filter, index) => (
+            {filterList.filter(v => (v.name === '거래유형' || v.name === '결제수단')).map((filter, index) => (
               <li key={`filter${index}`} className="filter_group_item">
                 <button
                   onClick={() => {
@@ -319,12 +323,12 @@ export default function ListView() {
                         {cateogryList.map((first, fIndex) => (
                           <li key={`first${fIndex}`} className="checkbox_field">
                             <input type="checkbox" id={`first${first.id}`} name="type"
-                              checked={selectedFirstIdFilterArray.includes(first.id)}
+                              checked={selectedFirstIdArray.includes(first.id)}
                               onChange={e => {
                                 if(e.target.checked){
-                                  setSelectedFirstIdFilterArray(selectedFirstIdFilterArray.concat(first.id))
+                                  setSelectedFirstIdArray(selectedFirstIdArray.concat(first.id))
                                 } else{
-                                  setSelectedFirstIdFilterArray(selectedFirstIdFilterArray.filter(id => id !== first.id))
+                                  setSelectedFirstIdArray(selectedFirstIdArray.filter(id => id !== first.id))
                                 }
                               }}
                             />
@@ -460,24 +464,42 @@ export default function ListView() {
                     )}
 
                     {filter.name === '결제수단' && (
-                      <div className="popover card">
-                        {/* {cateogryList.map((first, fIndex) => (
-                          <div className="checkbox_field" key={`first${fIndex}`}>
-                            <input type="checkbox" id={`first${first.id}`} name="type"
-                              // checked={selectedFirstCateogry?.id === first.id}
-                              // onChange={e => {
-                              //   if(e.target.checked){
-                              //     setSelectedFirstCategory(first);
-                              //   }
-                              // }}
+                      <ul className="popover card payment_method">
+                        <li className="checkbox_field">
+                          <input type="checkbox" id="payment_all" name="type"
+                            checked={selectedPaymentMethodIdArray === paymentMethodList.map(v => v.id)}
+                            onChange={e => {
+                              // if(e.target.checked){
+                              //   setSelectedPaymentMethodIdArray(selectedPaymentMethodIdArray.concat(payment.id))
+                              // } else{
+                              //   setSelectedPaymentMethodIdArray(selectedPaymentMethodIdArray.filter(id => id !== payment.id))
+                              // }
+                            }}
+                          />
+                          <label htmlFor="payment_all">
+                            <span className="mark" />
+                            <p>전체</p>
+                          </label>
+                        </li>
+                        {paymentMethodList.map((payment, pIndex) => (
+                          <li className="checkbox_field" key={`payment${pIndex}`}>
+                            <input type="checkbox" id={`payment${payment.id}`} name="type"
+                              checked={selectedPaymentMethodIdArray.includes(payment.id)}
+                              onChange={e => {
+                                if(e.target.checked){
+                                  setSelectedPaymentMethodIdArray(selectedPaymentMethodIdArray.concat(payment.id))
+                                } else{
+                                  setSelectedPaymentMethodIdArray(selectedPaymentMethodIdArray.filter(id => id !== payment.id))
+                                }
+                              }}
                             />
-                            <label htmlFor={`first${first.id}`}>
-                              <span className={`mark first${first.id}`} />
-                              <p>{first.name}</p>
+                            <label htmlFor={`payment${payment.id}`}>
+                              <span className="mark" />
+                              <p>{payment.name}</p>
                             </label>
-                          </div>
-                        ))} */}
-                      </div>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </>
                 )}
@@ -542,14 +564,14 @@ export default function ListView() {
                   <td>
                     <div className="flex">
                       <button type="button"
-                        className="btn edit"
+                        className="btn_ic edit"
                         onClick={() => {
                           setShowEditHistoryModal(true)
                           setSelectedHistory(history)
                         }}
                       />
                       <button type="button"
-                        className="btn delete"
+                        className="btn_ic delete"
                         onClick={() => {
                           deleteHistory(history.id)
                         }}
@@ -584,7 +606,6 @@ export default function ListView() {
 }
 
 const Container = styled.div`
-  max-width: 1200px;
   .area{
     &.summary{
       .input_field.standard{
@@ -648,36 +669,42 @@ const Container = styled.div`
           .popover.card{
             min-width: 288px;
             max-width: 360px;
-              &.category_first{
-                box-shadow: rgba(34, 34, 34, 0.2) 6px 6px 12px 6px;
-              }
+            &.category_first{
+              box-shadow: rgba(34, 34, 34, 0.2) 6px 6px 12px 6px;
+            }
 
-              &.category_second{
-                .group_area{
-                  > .fs12{
-                    margin-bottom: 6px;
-                  }
-                
-                  + .group_area{
-                    margin-top: 24px;
-                  }
+            /* &.category_second{
+              .group_area{
+                > .fs12{
+                  margin-bottom: 6px;
+                }
+              
+                + .group_area{
+                  margin-top: 24px;
                 }
               }
+            }
 
-              &.category_second{
-                .checkbox_field{
-                  width: 50%;
-                  &:nth-child(odd){
-                    padding-right: 12px;
-                  }
-                  &:nth-child(2) ~ .checkbox_field{
-                    margin-top: 6px;
-                  }
+            &.category_second{
+              .checkbox_field{
+                width: 50%;
+                &:nth-child(odd){
+                  padding-right: 12px;
+                }
+                &:nth-child(2) ~ .checkbox_field{
+                  margin-top: 6px;
                 }
               }
+            } */
+
+            &.payment_method{
+              li + li{
+                margin-top: 4px;
+              }
+            }
           }
 
-          + li{
+          + li.filter_group_item{
             margin-left: 12px;
           }
         }
@@ -724,7 +751,7 @@ const Container = styled.div`
           }
 
           td{
-            .btn.delete{
+            .btn_ic.delete{
               margin-left: 12px;
             }
 

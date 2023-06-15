@@ -19,8 +19,6 @@ export default function HomePage() {
   useEffect(() => {
     tokenRef.current = localStorage.getItem('token') ?? ''
     
-    console.log('홈 - 토큰ref', tokenRef.current)
-
     if(tokenRef.current !== '' && tokenRef.current !== null) {
       getCashbookList()
     }
@@ -103,7 +101,7 @@ export default function HomePage() {
 
   return (
     <>
-      <Container>
+      <Container className="home">
         <button type="button" className="contained main add_cashbook"
           onClick={() => {
             setShowEditCashbook(true)

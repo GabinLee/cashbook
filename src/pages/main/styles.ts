@@ -3,7 +3,6 @@ import { Colors } from "../../style/Styles";
 
 
 export const Container = styled.div`
-  min-width: 1440px;
   display: flex;
   
   header{
@@ -59,7 +58,6 @@ export const Container = styled.div`
     padding: 18px 24px;
     button{
       background-color: transparent;
-      color: ${Colors.gray_5};
     }
   }
 

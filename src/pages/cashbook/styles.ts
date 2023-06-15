@@ -6,6 +6,7 @@ export const Container = styled.main`
   }
 
   .contents{
+    max-width: 1200px;
     height: calc(100% - 60px);
   }
 

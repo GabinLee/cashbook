@@ -13,6 +13,7 @@ export default class CashbookHistory{
   thirdCategory: ThirdCategory|null = null
   thirdCategoryId: number = -1
   paymentMethod: PaymentMethod|null = null
+  paymentMethodId: number = -1
   imageList: HistoryReceipt[] = []
   
 
