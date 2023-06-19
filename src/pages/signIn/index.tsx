@@ -69,8 +69,8 @@ export default function SignInPage() {
     console.log('onClickLoginKakao')
 
     const REST_API_KEY = '67a2cfcec81c116238e7fd3459c119e8';
-    const REDIRECT_URI = 'http://localhost:3000/sign-in?type=kakao';
-    // const REDIRECT_URI = `https://cash-book.netlify.app/sign-in?type=kakao`;
+    // const REDIRECT_URI = 'http://localhost:3000/sign-in?type=kakao';
+    const REDIRECT_URI = `https://cash-book.netlify.app/sign-in?type=kakao`;
     
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`
   }
