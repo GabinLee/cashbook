@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom"
 import CashbookHistory, { HistoryFilterList } from "../../models/CashbookHistory.model"
 import FirstCategory from "../../models/Category.model"
 import PaymentMethod from "../../models/PaymentMethod.model"
+import { addComma } from "../../utils/utils"
 
 
 export default function ListView() {
@@ -37,16 +38,13 @@ export default function ListView() {
   const [filteredHistoryList, setFilteredHistoryList] = useState<CashbookHistory[]>([])
   
   const [selectedFirstIdArray, setSelectedFirstIdArray] = useState<number[]>([])
-  // const [selectableSecondFilterArray, setSelectableSecondFilterArray] = useState<FirstCategory[]>([])
-  // const [selectedSecondIdFilterArray, setSelectedSecondIdFilterArray] = useState <number[]>([])
-  // const [selectableThirdFilterArray, setSelectableThirdFilterArray] = useState()
+  const [selectedSecondIdArray, setSelectedSecondIdArray] = useState <number[]>([])
   // const [selectedThirdFilterArray, setSelectedThirdFilterArray] = useState<number[]>([])
   const [selectedPaymentMethodIdArray, setSelectedPaymentMethodIdArray] = useState<number[]>([])
 
 
-
   useEffect(() => {
-    tokenRef.current = localStorage.getItem('token') ?? ''
+    tokenRef.current = localStorage.getItem('token') ?? '';
   }, [])
 
   useEffect(() => {
@@ -54,144 +52,50 @@ export default function ListView() {
     getPaymentMethod();
     getHistory();
 
-    setFilteredHistoryList(historyList.filter(v => moment(v.date).format('YYYY-MM') === month))
-    setMonth(moment().format('YYYY-MM'))
-
+    setMonth(moment().format('YYYY-MM'));
   }, [id])
 
   useEffect(() => {
-    let monthlyExpense = 0
-    expenseList.forEach(item => {
-      monthlyExpense += item.price
-    })
-    setTotalExpense(monthlyExpense)
+    setFilteredHistoryList(historyList.filter(v => moment(v.date).format('YYYY-MM') === month));
 
-    let monthlyIncome = 0
-    incomeList.forEach(item => {
-      monthlyIncome += item.price
-    })
-    setTotalIncome(monthlyIncome)
+    setTotalExpense(expenseList.map(v => v.price).reduce((price, cur) => price + cur, 0))
+
+    setTotalIncome(incomeList.map(v => v.price).reduce((price, cur) => price + cur, 0))
     
-    let monthlySaving = 0
-    savingList.forEach(item => {
-      monthlySaving += item.price
-    })
-    setTotalSaving(monthlySaving)
+    setTotalSaving(savingList.map(v => v.price).reduce((price, cur) => price + cur, 0))
+  }, [id, historyList, month])
 
-    // 거래유형 default
-    setSelectedFirstIdArray(cateogryList.map(v => v.id))
+  // filter default
+  useEffect(() => {
+    // filter_first default
+    setSelectedFirstIdArray(cateogryList.map(v => v.id));
+
+    // filter_second default
+    if(selectedSecondIdArray.length === 0){
+      setSelectedSecondIdArray(selectedSecondIdArray.concat(...cateogryList.filter(first => cateogryList.map(v => v.id).includes(first.id)).map(first => first.secondCategoryList.map(second => second.id))));
+    };
 
     // 결제수단 default
-    setSelectedPaymentMethodIdArray(paymentMethodList.map(v => v.id))
+    setSelectedPaymentMethodIdArray(paymentMethodList.map(v => v.id));
+  }, [cateogryList, historyList, paymentMethodList])
 
-  }, [historyList, month])
-
-  // 월
+  // first 체크에 따른 filter_second list
   useEffect(() => {
-    setFilteredHistoryList(historyList.filter(v => moment(v.date).format('YYYY-MM') === month))
-  }, [month])
+    setSelectedSecondIdArray(cateogryList.filter(first => selectedFirstIdArray.includes(first.id)).map(first => first.secondCategoryList.map(second => second.id)).reduce((acc, cur) => acc.concat(cur), []));
+  }, [selectedFirstIdArray])
 
-  // 거래유형 체크여부에 따른 필터
+  // 거래유형, 1차, 결제수단 체크여부에 따른 내역 필터
   useEffect(() => {
     setFilteredHistoryList(historyList.filter(v => {
       return selectedFirstIdArray.includes(v.firstCategoryId)
-    }))
-  }, [selectedFirstIdArray])
-
-  // 결제수단 체크여부에 따른 필터
-  useEffect(() => {
-    setFilteredHistoryList(historyList.filter(v => {
+    }).filter(v => {
+      return selectedSecondIdArray.includes(v.secondCategoryId)
+    }).filter(v => {
       if(v.paymentMethod !== null){
         return selectedPaymentMethodIdArray.includes(v.paymentMethod.id)
       }
-    }))
-  }, [selectedPaymentMethodIdArray])
-
-
-
-
-  // useEffect(() => {
-  //   // 1차 default
-  //   setSelectableSecondFilterArray(cateogryList.filter(first => {
-  //     return selectedFirstIdFilterArray.includes(first.id)
-  //   }))
-    
-  //   // console.log('검증', selectedSecondIdFilterArray)
-
-  //   // setSelectedSecondIdFilterArray()
-
-  //   // console.log('테스트', cateogryList.forEach(v => {
-  //   //   // setSelectedSecondIdFilterArray(selectableSecondFilterArray.map(first => first.secondCategoryList.filter(second => {
-  //   //   //   return selectedFirstIdFilterArray.includes(second.firstCategoryId)
-  //   //   // }).map(v => v.id)))
-  //   // }))
-
-
-  //   // console.log('검증', selectableSecondFilterArray.forEach(v => {
-  //   //   setSelectedSecondIdFilterArray(selectedSecondIdFilterArray.concat(v.secondCategoryList.filter(second => {
-  //   //     return selectedFirstIdFilterArray.includes(second.firstCategoryId)
-  //   //   }).map(v => v.id)))
-  //   // }))
-
-    
-  //   // selectableSecondFilterArray.map(first => first.secondCategoryList.filter(second => {
-  //   //   return selectedFirstIdFilterArray.includes(second.firstCategoryId)
-  //   // }).map(v => v))
-
-  //   // console.log('검증', selectableSecondFilterArray.forEach(v => {
-  //   //   v.secondCategoryList.filter(second => {
-  //   //     return selectedFirstIdFilterArray.includes(second.firstCategoryId)
-  //   //   }).map(v => v.id)
-  //   // }))
-
-
-  //   // let abc: number[] = []
-    
-  //   // .forEach(v => {
-  //   //   // abc = abc.concat(v.secondCategoryList.map(v => v.id))
-  //   //   setSelectedSecondIdFilterArray(v.secondCategoryList.map(v => v.id))
-  //   // })
-  //   // setSelectedSecondIdFilterArray(abc)
-
-  //   const defaultSecond = cateogryList.filter(v => selectedFirstIdFilterArray.includes(v.id)).map(v => v.secondCategoryList.map(second => second.id))
-
-  //   // defaultSecond.forEach(second => {
-  //   //   setSelectedSecondIdFilterArray(selectedSecondIdFilterArray.concat(second))
-  //   // })
-
-  //   // const extraction = selectableSecondFilterArray.filter(v => selectedFirstIdFilterArray.includes(v.id)).map(v => v.secondCategoryList.map(second => second.id))
-  // }, [filteredHistoryList])
-
-
-  // useEffect(() => {
-  //   // 1차 default
-  //   // console.log('확인 selectableSecondFilterArray', selectableSecondFilterArray.filter(first => {
-  //   //   return selectedFirstIdFilterArray.includes(first.id)
-  //   // }))
-
-
-  //   //   const defaultSecond = cateogryList.filter(v => selectedFirstFilterArray.includes(v.id)).map(v => v.secondCategoryList.map(second => second.id))
-  // //   defaultSecond.forEach(second => {
-  // //     setSelectedSecondFilterArray(selectedSecondFilterArray.concat(second))
-  // //   })
-
-  // //   let allSecondCategoryArray: number[] = []
-  // //   cateogryList.forEach(v => {
-  // //     allSecondCategoryArray = allSecondCategoryArray.concat(v.secondCategoryList.map(v => v.id))
-  // //   })
-  // //   setSelectedSecondFilterArray(allSecondCategoryArray)
-    
-  //   // .map(first => first.secondCategoryList.map(second =>  second.name))
-    
-  //   // console.log('확인', cateogryList.map(first => first.secondCategoryList.map(second =>  second.name)))
-  //   // selectableSecondFilterArray
-  //   // selectedSecondIdFilterArray
-
-  //   // setFilteredHistoryList(historyList.filter(v => {
-  //   //   return selectedFirstFilterArray.includes(v.firstCategoryId)
-  //   // }))
-    
-  // }, [selectedFirstIdFilterArray])
+    }));
+  }, [selectedFirstIdArray, selectedSecondIdArray, selectedPaymentMethodIdArray])
 
 
   const getCategory = () => {
@@ -204,7 +108,7 @@ export default function ListView() {
       if(response.data.success){
         console.log('카테고리 조회 성공', response.data.data)
 
-        setCategoryList(response.data.data)
+        setCategoryList(response.data.data);
       } else{
         alert('error')
       }
@@ -224,7 +128,7 @@ export default function ListView() {
       if(response.data.success){
         console.log('결제수단 조회 성공', response.data.data)
 
-        setPaymentMethodList(response.data.data)
+        setPaymentMethodList(response.data.data);
       } else{
         alert('error')
       }
@@ -245,8 +149,8 @@ export default function ListView() {
       if(response.data.success) {
         console.log('내역 조회 성공', response.data.data.results)
 
-        setHistoryList(response.data.data.results)
-        setFilteredHistoryList(response.data.data.results)
+        setHistoryList(response.data.data.results);
+        setFilteredHistoryList(response.data.data.results);
       } else{
         alert('error')
       }
@@ -263,15 +167,11 @@ export default function ListView() {
       if(response.data.success){
         console.log('내역 삭제 성공', response.data.data)
     
-        getHistory()
+        getHistory();
       } else{
         alert('error')
       }
     }).catch(error => console.log(error))
-  }
-    
-  const addComma = (price: number) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
 
@@ -302,7 +202,7 @@ export default function ListView() {
 
         <div className="area filter_add flex">
           <ul className="flex1 flex flex-wrap filter_group">
-            {filterList.filter(v => (v.name === '거래유형' || v.name === '결제수단')).map((filter, index) => (
+            {filterList.filter(v => (v.name !== '2차')).map((filter, index) => (
               <li key={`filter${index}`} className="filter_group_item">
                 <button
                   onClick={() => {
@@ -341,125 +241,105 @@ export default function ListView() {
                       </ul>
                     )}
 
-                    {false && (
-                      <>
-                        {filter.name === '1차' && (
-                          <div className="popover card category_second">
-                            {/* {selectableSecondFilterArray.map((first, fIndex) => (
-                              <div className="group_area" key={`first${fIndex}`}>
-                                <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name}</p>
-                                <ul className="check_list flex ai-c flex-wrap">
-                                  {first.secondCategoryList.map((second, sIndex) => (
-                                    <li className="checkbox_field" key={`second${sIndex}`}>
-                                      <input type="checkbox" id={`${second.firstCategoryId}second${second.id}`} name="type"
-                                        checked={selectedSecondIdFilterArray.includes(second.id)}
-                                        onChange={e => {
-                                          if(e.target.checked) {
-                                            setSelectedSecondIdFilterArray(selectedSecondIdFilterArray.concat(second.id))
-                                          } else{
-                                            setSelectedSecondIdFilterArray(selectedSecondIdFilterArray.filter(id => id !== second.id))
-                                          }
-                                        }}
-                                      />
-                                      <label htmlFor={`${second.firstCategoryId}second${second.id}`}>
-                                        <span className="mark" />
-                                        <p>{second.name}</p>
-                                      </label>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))} */}
+                    {filter.name === '1차' && (
+                      <div className="popover card category_second">
+                        {cateogryList.filter(first => selectedFirstIdArray.includes(first.id)).map((first, fIndex) => (
+                          <div className={`area_group${first.name === '지출' ? ' expense' : first.name === '수입' ?  ' income' : ' saving'}`} key={`first${fIndex}`}>
+                            <p className="fs12">{first.name}</p>
+                            {/* <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name}</p> */}
 
-                            {/* {cateogryList.filter(first => {
-                              return selectedFirstIdFilterArray.includes(first.id)
-                            }).map((first, fIndex) => (
-                              <div className="group_area" key={`first${fIndex}`}>
-                                <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name}</p>
-                                {first.secondCategoryList.map((second, sIndex) => (
-                                  <p key={`second${sIndex}`}>{second.name}</p>
-                                ))}
-                              </div>
-                            ))} */}
-
-                            {/* {cateogryList.filter(first => {
-                              if(!selectedFirstFilterArray.includes(first.id)) return false;
-                              if(first.secondCategoryList.length === 0) return false;
-                              return true
-                            }).map((first, fIndex) => (
-                              <div className="group_area" key={`first${fIndex}`}>
-                                <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name}</p>
-                                
-                              </div>
-                            ))} */}
+                            <ul className="check_list flex ai-c flex-wrap">
+                              {first.secondCategoryList.map((second, sIndex) => (
+                                <li className="checkbox_field" key={`second${sIndex}`}>
+                                  <input type="checkbox" id={`${second.firstCategoryId}second${second.id}`} name="secondFilter"
+                                  checked={selectedSecondIdArray.includes(second.id)}
+                                  onChange={e => {
+                                    if(e.target.checked) {
+                                      setSelectedSecondIdArray(selectedSecondIdArray.concat(second.id))
+                                    } else{
+                                      setSelectedSecondIdArray(selectedSecondIdArray.filter(id => id !== second.id))
+                                    }
+                                  }}
+                                />
+                                <label htmlFor={`${second.firstCategoryId}second${second.id}`}>
+                                  <span className="mark" />
+                                  <p>{second.name}</p>
+                                </label>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                        )}
-
-                    {filter.name === '2차' && (
-                      <div className="popover card category_third">
-                        {/* {cateogryList.filter(first => {
-                          if(!selectedFirstFilterArray.includes(first.id)) return false;
-
-                          if(first.secondCategoryList.length === 0) return false;
-
-                          const totalCountArray = first.secondCategoryList.map(v => v.thirdCategoryList.length).reduce((a, c) => a + c, 0)
-                          if(totalCountArray === 0) return false;
-
-                          return true
-                        }).map((first, fIndex) => (
-                          first.secondCategoryList.map((second, sIndex) => (
-                            <div className="group_area" key={`first${fIndex}second${sIndex}`}>
-                              <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name} - {second.name}</p>
-
-                            </div>
-                            // second.thirdCategoryList.map((third, tIndex) => (
-                            //   <p>{third.name}</p>
-                            // ))
-                          ))
-                        ))} */}
-
-                        {/* .map((first, fIndex) => (
-                          first.secondCategoryList.filter(second => {
-                            if(second.thirdCategoryList.length === 0) return false;
-                            return true;
-                          }).map((second, sIndex) => (
-                            <div className="card_cont" key={`first${index}second${sIndex}`}>
-                              
-                              <ul className="check_list flex ai-c flex-wrap">
-                                {second.thirdCategoryList.filter(v => true).map((third, tIndex) => (
-                                  // <p key={`first${index}second${sIndex}third${tIndex}`}>{third.name}</p>
-                                  <div className="checkbox_field" key={`first${index}second${sIndex}third${tIndex}`}>
-                                    <input type="checkbox" id={`third${third.id}`} name="type"
-                                      // checked={selectedFirstCateogry?.id === first.id}
-                                      // onChange={e => {
-                                      //   if(e.target.checked){
-                                      //     setSelectedFirstCategory(first);
-                                      //   }
-                                      // }}
-                                    />
-                                    <label htmlFor={`third${third.id}`}>
-                                      <span className="mark" />
-                                      <p>{third.name}</p>
-                                    </label>
-                                  </div>
-                                ))}
-                              </ul>
-                            </div>
-                          ))
-                        )) */}
-
-                        <div className="group_btn">
-                          <button className="contained gray"
-                            onClick={() => {}}
-                          >초기화</button>
-                          <button className="contained main"
-                            onClick={() => {
-                              filter.isShowPopover = false
-                            }}
-                          >필터 적용</button>
-                        </div>
+                        ))}
                       </div>
                     )}
+
+                    {false && (
+                      <>
+                        {filter.name === '2차' && (
+                          <div className="popover card category_third">
+                            {/* {cateogryList.filter(first => {
+                              if(!selectedFirstFilterArray.includes(first.id)) return false;
+
+                              if(first.secondCategoryList.length === 0) return false;
+
+                              const totalCountArray = first.secondCategoryList.map(v => v.thirdCategoryList.length).reduce((a, c) => a + c, 0)
+                              if(totalCountArray === 0) return false;
+
+                              return true
+                            }).map((first, fIndex) => (
+                              first.secondCategoryList.map((second, sIndex) => (
+                                <div className="group_area" key={`first${fIndex}second${sIndex}`}>
+                                  <p className={`fs12 ${first.name === '지출' ? 'color_red' : first.name === '수입' ?  'color_green' : 'color_yellow'}`}>{first.name} - {second.name}</p>
+
+                                </div>
+                                // second.thirdCategoryList.map((third, tIndex) => (
+                                //   <p>{third.name}</p>
+                                // ))
+                              ))
+                            ))} */}
+
+                            {/* .map((first, fIndex) => (
+                              first.secondCategoryList.filter(second => {
+                                if(second.thirdCategoryList.length === 0) return false;
+                                return true;
+                              }).map((second, sIndex) => (
+                                <div className="card_cont" key={`first${index}second${sIndex}`}>
+                                  
+                                  <ul className="check_list flex ai-c flex-wrap">
+                                    {second.thirdCategoryList.filter(v => true).map((third, tIndex) => (
+                                      // <p key={`first${index}second${sIndex}third${tIndex}`}>{third.name}</p>
+                                      <div className="checkbox_field" key={`first${index}second${sIndex}third${tIndex}`}>
+                                        <input type="checkbox" id={`third${third.id}`} name="type"
+                                          // checked={selectedFirstCateogry?.id === first.id}
+                                          // onChange={e => {
+                                          //   if(e.target.checked){
+                                          //     setSelectedFirstCategory(first);
+                                          //   }
+                                          // }}
+                                        />
+                                        <label htmlFor={`third${third.id}`}>
+                                          <span className="mark" />
+                                          <p>{third.name}</p>
+                                        </label>
+                                      </div>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))
+                            )) */}
+
+                            <div className="group_btn">
+                              <button className="contained gray"
+                                onClick={() => {}}
+                              >초기화</button>
+                              <button className="contained main"
+                                onClick={() => {
+                                  filter.isShowPopover = false
+                                }}
+                              >필터 적용</button>
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
 
@@ -669,33 +549,75 @@ const Container = styled.div`
           .popover.card{
             min-width: 288px;
             max-width: 360px;
-            &.category_first{
-              box-shadow: rgba(34, 34, 34, 0.2) 6px 6px 12px 6px;
-            }
+            &.category{
+              &_first{
+                box-shadow: rgba(34, 34, 34, 0.2) 6px 6px 12px 6px;
+              }
+              &_second{
+                .area_group{
+                  + .area_group{
+                    margin-top: 24px;
+                  }
 
-            /* &.category_second{
-              .group_area{
-                > .fs12{
-                  margin-bottom: 6px;
-                }
-              
-                + .group_area{
-                  margin-top: 24px;
+                  &.expense{
+                    > .fs12{
+                      color: ${Colors.red};
+                    }
+                    input[type=checkbox]{
+                      &:checked + label .mark{
+                        border-color: ${Colors.red};
+                        background-color: ${Colors.red};
+                      }
+                      + label:hover::before{
+                        background-color: rgba(228,0,0, .2);
+                      }
+                    }
+                  }
+                  &.income{
+                    > .fs12{
+                      color: ${Colors.green};
+                    }
+                    input[type=checkbox]{
+                      &:checked + label .mark{
+                        border-color: ${Colors.green};
+                        background-color: ${Colors.green};
+                      }
+                      + label:hover::before{
+                        background-color: rgba(56,138,73, .2);
+                      }
+                    }
+                  }
+                  &.saving{
+                    > .fs12{
+                      color: ${Colors.yellow};
+                    }
+                    input[type=checkbox]{
+                      &:checked + label .mark{
+                        border-color: ${Colors.yellow};
+                        background-color: ${Colors.yellow};
+                      }
+                      + label:hover::before{
+                        background-color: rgba(246,146,0, .25);
+                      }
+                    }
+                  }
+
+                  > .fs12{
+                    margin-bottom: 6px;
+                  }
+                  
+                  .checkbox_field{
+                    width: calc(50% - 6px);
+                    &:nth-child(even){
+                      margin-left: 12px;
+                    }
+                    &:nth-child(2) ~ .checkbox_field{
+                      margin-top: 6px;
+                    }
+                  }
                 }
               }
             }
-
-            &.category_second{
-              .checkbox_field{
-                width: 50%;
-                &:nth-child(odd){
-                  padding-right: 12px;
-                }
-                &:nth-child(2) ~ .checkbox_field{
-                  margin-top: 6px;
-                }
-              }
-            } */
 
             &.payment_method{
               li + li{

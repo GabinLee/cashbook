@@ -21,7 +21,6 @@ export default function CashbookStatistics() {
   const [filteredHistoryList, setFilteredHistoryList] = useState<CashbookHistory[]>([])
 
   const [expenseSecondList, setExpenseSecondList] = useState<string[]>([])
-  const [expenseList, setExpenseList] = useState<CashbookHistory[]>([])
   const [expensePriceArray, setExpensePriceArray] = useState<number[]>([])
   const [incomeSecondList, setIncomeSecondList] = useState<string[]>([])
   const [incomePriceArray, setIncomePriceArray] = useState<number[]>([])
@@ -36,7 +35,7 @@ export default function CashbookStatistics() {
   const [incomeBgColor, setIncomeBgColor] = useState<string[]>([])
   const [savingBgColor, setSavingBgColor] = useState<string[]>([])
   const backgroundColor5 = ['#fe7877bf', '#f7d021bf','#2dcc70bf', '#5fa9ffbf']
-  const backgroundColor9 = ['#fe7877bf', '#fd925ebf', '#f7d021bf', '#88e18ebf', '#2dcc70bf', '#99e1ffbf', '#5fa9ffbf', '#c29effbf', '#fb6a87bf']
+  const backgroundColor9 = ['#fe7877bf', '#fd925ebf', '#f7d021bf', '#88e18ebf', '#2dcc70bf', '#99e1ffbf', '#5fa9ffbf', '#c29effbf', '#fb88ffbf']
 
 
   useEffect(() => {
@@ -196,7 +195,7 @@ export default function CashbookStatistics() {
       </div>
 
       <ul className="flex chart_group">
-        <li className="area">
+        <li className="card">
           {historyExpense.length !== 0 ?
             <>
             <div className="chart_bx">
@@ -219,7 +218,7 @@ export default function CashbookStatistics() {
           : <p className="data-none">지출 내역이 없습니다.</p>}
         </li>
 
-        <li className="area">
+        <li className="card">
           {historySaving.length !== 0 ?
             <>
             <div className="chart_bx">
@@ -242,7 +241,7 @@ export default function CashbookStatistics() {
           : <p className="data-none">저축 내역이 없습니다.</p>}
         </li>
 
-        <li className="area">
+        <li className="card">
           {historyIncome.length !== 0 ?
             <>
             <div className="chart_bx">
@@ -282,13 +281,15 @@ const Container = styled.div`
   }
 
   .chart_group{
-    padding-top: 10px;
+    padding-top: 24px;
   }
 
-  .area{
+  .card{
     flex: 1;
-    + .area{
-      margin-left: 12px;
+    padding: 24px 12px;
+    border-radius: 24px;
+    + .card{
+      margin-left: 24px;
     }
 
     .chart_bx{
@@ -316,7 +317,7 @@ const Container = styled.div`
             padding: 0 12px;
           }
           &.badge{
-            width: 36px;
+            width: 40px;
             height: 20px;
             border-radius: 6px;
             color: white;

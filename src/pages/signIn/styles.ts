@@ -21,41 +21,53 @@ export const Container = styled.section`
       text-align: center;
     }
 
-    button{
+    .id_pw{
+      border: .5px solid white;
+      border-radius: 13px;
+    }
+    .input_field{
+      input{
+        height: 48px;
+        padding: 0 12px;
+        color: white;
+        background-color: transparent;
+        outline-color: white;
+        &::placeholder{
+          color: rgba(255, 255, 255, 0.6);
+        }
+      }
+      &.id{
+        input{
+          border: .5px solid white;
+          border-radius: 12px 12px 0 0;
+        }
+      }
+      &.pw{
+        input{
+          border: .5px solid white;
+          border-radius: 0 0 12px 12px;
+        }
+      }
+    }
+
+
+    button.contained.main, .kakao{
       width: 300px;
       height: 45px;
-      border-radius: 6px;
+      border-radius: 12px;
       overflow: hidden;
     }
-
-    /* max-width: 1200px;
-    padding: 36px;
-    color: white;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap; */
-
-    /* .input_field{
-      margin: 13px 0 37px;
-      input{
-        color: white;
-      }
-
-      p{
-        color: white;
-        transition: all .25s;
-      }
+    button.contained.main{
+      margin-top: 24px;
     }
-
-    .contained.main{
-      width: 100%;
-      height: 40px;
-      margin-top: 60px;
+    .kakao{
+      background-color: #FEE500;
     }
 
     .group_btn{
-      margin-top: 36px;
+      margin-top: 12px;
       button{
+        height: 24px;
         padding: 0;
         color: white;
         font-size: 13px;
@@ -80,6 +92,52 @@ export const Container = styled.section`
           text-decoration: underline;
         }
       }
-    } */
+    }
+
+    .or{
+      margin: 48px 0 24px;
+      color: white;
+      font-size: 10px;
+      text-align: center;
+      position: relative;
+      &::before{
+        content: '';
+        width: 42%;
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.5);
+        position: absolute;
+        top: calc(50% - 0.5px);
+        left: 0;
+      }
+      &::after{
+        content: '';
+        width: 42%;
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.5);
+        position: absolute;
+        top: calc(50% - 0.5px);
+        right: 0;
+      }
+    }
+
+    /* max-width: 1200px;
+    padding: 36px;
+    color: white;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; */
+
+    /* .input_field{
+      margin: 13px 0 37px;
+      input{
+        color: white;
+      }
+
+      p{
+        color: white;
+        transition: all .25s;
+      }
+    }
+     */
   }
 `

@@ -356,7 +356,7 @@ export default function SettingsView() {
                   <div className="flex ai-c">
                     <p>
                       <span>{method.name}</span>
-                      {(method.type === 0) && <span>({method.paymentDay}일)</span>}
+                      {(method.type === 0 && false) && <span>({method.paymentDay}일)</span>}
                     </p>
                     <button className="btn_ic edit"
                       onClick={() => {

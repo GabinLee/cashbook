@@ -3,10 +3,11 @@ import { useEffect, useRef } from "react";
 import './style/reset.scss';
 import './style/global.scss';
 import SignInPage from "./pages/signIn";
+import LayoutPage from "./pages/layout";
 import MainPage from "./pages/main";
-import HomePage from "./pages/home";
 import CashBookPage from "./pages/cashbook";
-import SettingsPage from "./pages/settings";
+// // import HomePage from "./pages/home";
+// import SettingsPage from "./pages/settings";
 
 
 function App() {
@@ -16,6 +17,8 @@ function App() {
 
   useEffect(() => {
     tokenRef.current = localStorage.getItem('token') ?? ''
+
+    console.log('APP - token', tokenRef.current)
 
   }, [])
 
@@ -31,7 +34,8 @@ function App() {
         navigate('/')
       }
       else {
-        navigate(`${location.pathname}`)
+        // console.log(location);
+        navigate(`${location.pathname}${location.search}`)
       }
     }
 
@@ -42,11 +46,10 @@ function App() {
     <Routes>
       <Route path="sign-in" element={<SignInPage />} />
 
-      <Route path="" element={<MainPage />}>
-        <Route path="/" element={<HomePage />} />
+      <Route path="" element={<LayoutPage />}>
+        <Route path="/" element={<MainPage />} />
         <Route path="/:id" element={<CashBookPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        
+        {/* <Route path="/settings" element={<SettingsPage />} /> */}
       </Route>
     </Routes>
   );

@@ -24,12 +24,12 @@ export default function EditPaymentMethodModal(props: EditPaymentMethod) {
   const [name, setName] = useState(props.paymentMethod ? props.paymentMethod.name : '')
   const [paymentDay, setPaymentDay] = useState(props.paymentMethod ? (props.paymentMethod.type === 0 ? props.paymentMethod.paymentDay : undefined) : undefined)
 
-  const isValidConfirm = (type === 0 ? !(name && paymentDay) : !name)
+  // const isValidConfirm = (type === 0 ? !(name && paymentDay) : !name)
+  const isValidConfirm = !name;
 
   
   useEffect(() => {
     tokenRef.current = localStorage.getItem('token') ?? ''
-
   }, [])
 
   useEffect(() => {
@@ -128,7 +128,7 @@ export default function EditPaymentMethodModal(props: EditPaymentMethod) {
             />
           </div>
 
-          {(type === 0) && (
+          {(type === 0 && false) && (
             <div className="select_field flex">
               <p>카드 대금 결제일</p>
               <div>
@@ -148,7 +148,6 @@ export default function EditPaymentMethodModal(props: EditPaymentMethod) {
               </div>
             </div>
           )}
-
         </div>
           
         <div className="card_bottom">
