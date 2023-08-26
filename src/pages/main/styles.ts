@@ -3,40 +3,58 @@ import { Colors } from "../../style/Styles";
 
 
 export const Container = styled.main`
-  height: 100vh;
+.modal{
+  padding: 60px;
+  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  z-index: 101;
 
-  header{
-    width: 100%;
-    height: 70px;
-    background-color: ${Colors.light_main};
-    display: flex;
-    position: fixed;
-    top: 0;
-    z-index: 1;
-    button{
-      width: 120px;
-      margin: auto;
-      background-color: inherit;
-    }
-    img{
-      width: 48px;
-      margin: auto;
-    }
+  .card{
+    min-width: 260px;
+    height: auto;
+    max-height: 100%;
+    border-radius: 24px;
+    overflow: auto;
   }
-
-  main{
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 94px 24px 0;
-  }
+}
 
   .add_cashbook{
-    height: 36px;
-    margin-bottom: 14px;
-    padding: 0 12px;
-    position: relative;
+    padding: 24px 24px 12px;
+    button{
+      width: 120px;
+      height: 40px;
+    }
   }
-  
+
+  section{
+    + section{
+      margin-top: 36px;
+    }
+
+    h5{
+      padding: 24px 24px 0;
+      color: ${Colors.main};
+    }
+
+    ul{
+      padding: 12px 12px 0;
+      li{
+        width: 25%;
+        padding: 12px;
+        .card{
+          padding: 20px 12px 20px 24px;
+          border-radius: 12px;
+        }
+      }
+    }
+  }
+
+
+  /*
   ul{
     max-height: calc(100% - 50px);
     margin: 0 -12px;
@@ -58,10 +76,7 @@ export const Container = styled.main`
   .card{
     width: 100%;
     min-width: 288px;
-    border-radius: 12px;
-    padding: 24px;
     cursor: pointer;
-
     &:hover{
       background-color: ${Colors.light_main};
     }
@@ -86,5 +101,5 @@ export const Container = styled.main`
       margin-top: 12px;
       color: ${Colors.gray_5};
     }
-  }
+  } */
 `

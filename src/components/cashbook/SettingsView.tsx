@@ -4,37 +4,41 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import FirstCategory, { SecondCategory, ThirdCategory } from "../../models/Category.model";
+import PaymentMethod from "../../models/PaymentMethod.model";
+import { ModalData } from "../../models/AlertModal.model";
 import EditSecondCategoryModal from "./EditSecondCategoryModal";
 import EditThirdCategoryModal from "./EditThirdCategoryModal";
 import EditPaymentMethodModal from "./EditPaymentMethodModal";
-import PaymentMethod from "../../models/PaymentMethod.model";
+import PopoverMenu from "../popover/PopoverMenu";
+import AlertModal from "../AlertModal";
 
 
 export default function SettingsView() {
   const {id} = useParams()
   const tokenRef = useRef('')
-  // const popoverRef = useRef<any>(null)
+  // const popoverRef = useRef<HTMLDivElement>(null)
 
-  const [cateogryList, setCategoryList] = useState<FirstCategory[]>([])
-  const [selectedFirst, setSelectedFirst] = useState<FirstCategory>()
-  const [showEditSecondCategoryModal, setShowEditSecondCategoryModal] = useState(false)
-  const [selectedSecond, setSelectedSecond] = useState<SecondCategory>()
-  const [showEditThirdCategoryModal, setShowEditThirdCategoryModal] = useState(false)
-  const [selectedThird, setSelectedThird] = useState<ThirdCategory>()
+  const [cateogryList, setCategoryList] = useState<FirstCategory[]>([]);
+  const [selectedFirst, setSelectedFirst] = useState<FirstCategory>();
+  const [showEditSecondCategoryModal, setShowEditSecondCategoryModal] = useState(false);
+  const [selectedSecond, setSelectedSecond] = useState<SecondCategory>();
+  const [showEditThirdCategoryModal, setShowEditThirdCategoryModal] = useState(false);
+  const [selectedThird, setSelectedThird] = useState<ThirdCategory>();
 
-  const [paymentMethodList, setPaymentMethodList] = useState<PaymentMethod[]>([])
-  const [showEditPaymentMethodModal, setShowEditPaymentMethodModal] = useState(false)
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>()
+  const [paymentMethodList, setPaymentMethodList] = useState<PaymentMethod[]>([]);
+  const [showEditPaymentMethodModal, setShowEditPaymentMethodModal] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>();
+
+  const [modalAlertData, setModalAlertData] = useState<ModalData>();
 
 
   useEffect(() => {
-    tokenRef.current = localStorage.getItem('token') ?? ''
-    
+    tokenRef.current = localStorage.getItem('token') ?? '';
   }, [])
 
   useEffect(() => {
-    getCategory()
-    getPaymentMethod()
+    getCategory();
+    getPaymentMethod();
   }, [id])
 
   // useEffect(() => {
@@ -84,9 +88,9 @@ export default function SettingsView() {
     })
     .then(response => {
       if(response.data.success){
-        console.log('1차 카테고리 삭제 성공, deleteSecondCategory')
+        console.log('1차 카테고리 삭제 성공, deleteSecondCategory');
 
-        getCategory()
+        getCategory();
       } else{
         alert('error')
       }
@@ -170,82 +174,84 @@ export default function SettingsView() {
                 <ul>
                   {firstItem.secondCategoryList.map((secondItem, sIndex) => (
                     <li className="grid" key={`secondItem ${sIndex}`}>
-                      <div className="first flex ai-c">
+                      <div className="second flex ai-c">
                         <p className="flex1">{secondItem.name}</p>
-                        <div className="popover">
-                          <button type="button" className="btn_ic more"
-                            onClick={() => {
-                              setCategoryList(cateogryList.map(first => {
-                                if(first.id === firstItem.id) {
-                                  first.secondCategoryList.map(second => {
-                                    if(second.id === secondItem.id) {
-                                      // !second.isShowMoreMenu && (second.isShowMoreMenu = true)
-                                      second.isShowMoreMenu = !second.isShowMoreMenu
-                                    } else{
-                                      second.isShowMoreMenu = false
-                                    }
-
-                                    return second
-                                  })
+                        <PopoverMenu
+                          isShowMoreMenu={secondItem.isShowMoreMenu}
+                          onClickShowMenu={() => {
+                            setCategoryList(cateogryList.map(first => {
+                              first.secondCategoryList.map(second => {
+                                if(second.id === secondItem.id) {
+                                  second.isShowMoreMenu = !second.isShowMoreMenu
                                 } else{
-                                  first.secondCategoryList.map(second => {
-                                    second.isShowMoreMenu = false
-                                  })
+                                  second.isShowMoreMenu = false
                                 }
 
-                                first.secondCategoryList.map(second => {
-                                  second.thirdCategoryList.map(third => {
-                                    third.isShowMoreMenu = false
-                                  })
+                                second.thirdCategoryList.map(third => {
+                                  third.isShowMoreMenu = false
                                 })
-                                
-                                return first
-                              }))
-                            }}
-                          />
-                          {secondItem.isShowMoreMenu && (
-                            <div className="popover_menu"
-                              // ref={popoverRef}
-                            >
-                              <button type="button"
-                                onClick={() => {
-                                  setShowEditSecondCategoryModal(true)
-                                  setSelectedFirst(firstItem)
-                                  setSelectedSecond(secondItem)
-                                  setCategoryList(cateogryList.map(first => {
-                                    if(first.id === firstItem.id) {
-                                      first.secondCategoryList.map(second => {
-                                        if(second.id === secondItem.id) {
-                                          second.isShowMoreMenu = !second.isShowMoreMenu
-                                        } else{
-                                          second.isShowMoreMenu = false
-                                        }
+                              })
 
-                                        return second
-                                      })
-                                    } else{
-                                      first.secondCategoryList.map(second => {
-                                        second.isShowMoreMenu = false
+                              return first
+                            }))
+                          }}
+                          onClickHideMenu={() => {
+                            setCategoryList(cateogryList.map(first => {
+                              first.secondCategoryList.map(second => second.isShowMoreMenu = false)
 
-                                        return second
-                                      })
-                                    }
-                                    return first
-                                  }))
-                                }}
-                              >수정</button>
-                              <button type="button"
-                                onClick={() => {
-                                  deleteSecondCategory(secondItem.id)
-                                }}
-                              >삭제</button>
-                            </div>
-                          )}
-                        </div>
+                              return first
+                            }))
+                          }}
+                          onClickEdit={() => {
+                            setShowEditSecondCategoryModal(true)
+                            setSelectedFirst(firstItem)
+                            setSelectedSecond(secondItem)
+                            setCategoryList(cateogryList.map(first => {
+                              if(first.id === firstItem.id) {
+                                first.secondCategoryList.map(second => {
+                                  if(second.id === secondItem.id) {
+                                    second.isShowMoreMenu = !second.isShowMoreMenu
+                                  } else{
+                                    second.isShowMoreMenu = false
+                                  }
+
+                                  return second
+                                })
+                              } else{
+                                first.secondCategoryList.map(second => {
+                                  second.isShowMoreMenu = false
+
+                                  return second
+                                })
+                              }
+                              return first
+                            }))
+                          }}
+                          onClickDelete={() => {
+                            setCategoryList(cateogryList.map(first => {
+                              first.secondCategoryList.map(second => second.isShowMoreMenu = false)
+                              return first
+                            }))
+
+                            setModalAlertData({
+                              message: '삭제하시겠습니까?',
+                              leftButtonText: '취소',
+                              rightButtonText: '삭제',
+                              onClickLeftButton: () => setModalAlertData(undefined),
+                              onClickRightButton: () => {
+                                deleteSecondCategory(secondItem.id)
+                                setModalAlertData(undefined)
+                              }
+                            })
+                          }}
+                          styles={{
+                            btnSize: 30
+                          }}
+                        />
                       </div>
-                      <ul className="second flex ai-c">
+                      <ul className="third flex ai-c">
                         <li>
-                          <button type="button" className="btn_ic add"
+                          <button type="button" className="btn add"
                             onClick={() => {
                               setShowEditThirdCategoryModal(true)
                               setSelectedFirst(firstItem)
@@ -256,76 +262,83 @@ export default function SettingsView() {
                         {secondItem.thirdCategoryList.map((thirdItem, tIndex) => (
                           <li className="flex ai-c" key={`thirdItem ${tIndex}`}>
                             <p>{thirdItem.name}</p>
-                            <div className="popover">
-                              <button type="button" className="btn_ic more"
-                                onClick={() => {
-                                  setCategoryList(cateogryList.map(first => {
-                                    (first.id === firstItem.id) && (
-                                      first.secondCategoryList.map(second => {
-                                        if(second.id === secondItem.id){
-                                          second.thirdCategoryList.map(third => {
-                                            if(third.id === thirdItem.id){
-                                              // !third.isShowMoreMenu && (third.isShowMoreMenu = true)
-                                              third.isShowMoreMenu = !third.isShowMoreMenu
-                                            } else{
-                                              third.isShowMoreMenu = false
-                                            }
-                                            return third
-                                          })
-                                        } else{
-                                          second.thirdCategoryList.map(third => {
-                                            third.isShowMoreMenu = false
-                                          })
-                                        }
+                            <PopoverMenu
+                              isShowMoreMenu={thirdItem.isShowMoreMenu}
+                              onClickShowMenu={() => {
+                                setCategoryList(cateogryList.map(first => {
+                                  first.secondCategoryList.map(second => {
+                                    second.isShowMoreMenu = false;
+                                    second.thirdCategoryList.map(third => {
+                                      if(third.id === thirdItem.id) {
+                                        third.isShowMoreMenu = !third.isShowMoreMenu
+                                      } else{
+                                        third.isShowMoreMenu = false
+                                      }
+                                    })
+                                  })
+                                  
+                                  return first
+                                }))
+                              }}
+                              onClickHideMenu={() => {
+                                setCategoryList(cateogryList.map(first => {
+                                  first.secondCategoryList.map(second => {
+                                    second.thirdCategoryList.map(third => third.isShowMoreMenu = false)
+                                  })
 
-                                        second.isShowMoreMenu = false
+                                  return first;
+                                }))
+                              }}
+                              onClickEdit={() => {
+                                setShowEditThirdCategoryModal(true)
+                                setSelectedFirst(firstItem)
+                                setSelectedSecond(secondItem)
+                                setSelectedThird(thirdItem)
+                                setCategoryList(cateogryList.map(first => {
+                                  first.secondCategoryList.map(second => {
+                                    second.thirdCategoryList.map(third => {
+                                      third.isShowMoreMenu = false
 
-                                        return second
-                                      })
-                                    )
-                                    return first
-                                  }))
-                                }}
-                              />
-                              {thirdItem.isShowMoreMenu && (
-                                <div className="popover_menu"
-                                  // ref={popoverRef}
-                                >
-                                  <button type="button"
-                                    onClick={() => {
-                                      setShowEditThirdCategoryModal(true)
-                                      setSelectedFirst(firstItem)
-                                      setSelectedSecond(secondItem)
-                                      setSelectedThird(thirdItem)
-                                      setCategoryList(cateogryList.map(first => {
-                                        first.secondCategoryList.map(second => {
-                                          second.thirdCategoryList.map(third => {
-                                            third.isShowMoreMenu = false
+                                      return third;
+                                    })
 
-                                            return third
-                                          })
+                                    return second;
+                                  })
 
-                                          return second
-                                        })
+                                  return first;
+                                }))
+                              }}
+                              onClickDelete={() => {
+                                setCategoryList(cateogryList.map(first => {
+                                  first.secondCategoryList.map(second => {
+                                    second.thirdCategoryList.map(third => third.isShowMoreMenu = false)
+                                  })
+                                  return first
+                                }))
 
-                                        return first
-                                      }))
-                                    }}
-                                  >수정</button>
-                                  <button type="button"
-                                    onClick={() => {deleteThirdCategory(thirdItem.id)}}
-                                  >삭제</button>
-                                </div>
-                              )}
-                            </div>
+                                setModalAlertData({
+                                  message: '삭제하시겠습니까?',
+                                  leftButtonText: '취소',
+                                  rightButtonText: '삭제',
+                                  onClickLeftButton: () => setModalAlertData(undefined),
+                                  onClickRightButton: () => {
+                                    deleteThirdCategory(thirdItem.id)
+                                    setModalAlertData(undefined)
+                                  }
+                                })
+                              }}
+                              styles={{
+                                btnSize: 24
+                              }}
+                            />
                           </li>
                         ))}
                       </ul>
                     </li>
                   ))}
 
-                  <li>
-                    <button type="button" className="btn_ic add"
+                  <li className="add_second">
+                    <button type="button" className="btn add"
                       onClick={() => {
                         setShowEditSecondCategoryModal(true)
                         setSelectedFirst(firstItem)
@@ -345,7 +358,7 @@ export default function SettingsView() {
           </div>
 
           <div className="card_cont">
-            <button type="button" className="btn_ic add"
+            <button type="button" className="btn add"
               onClick={() => {
                 setShowEditPaymentMethodModal(true)
               }}
@@ -358,14 +371,25 @@ export default function SettingsView() {
                       <span>{method.name}</span>
                       {(method.type === 0 && false) && <span>({method.paymentDay}일)</span>}
                     </p>
-                    <button className="btn_ic edit"
+                    <button className="btn_edit btn30"
                       onClick={() => {
                         setShowEditPaymentMethodModal(true)
                         setSelectedPaymentMethod(method)
                       }}
                     ></button>
-                    <button className="btn_ic delete"
-                      onClick={() => deletePaymentMethod(method.id)}
+                    <button className="btn_delete btn30"
+                      onClick={() => {
+                        setModalAlertData({
+                          message: '삭제하시겠습니까?',
+                          leftButtonText: '취소',
+                          rightButtonText: '삭제',
+                          onClickLeftButton: () => setModalAlertData(undefined),
+                          onClickRightButton: () => {
+                            deletePaymentMethod(method.id)
+                            setModalAlertData(undefined)
+                          }
+                        })
+                      }}
                     ></button>
                   </div>
                 </li>
@@ -428,32 +452,28 @@ export default function SettingsView() {
           }}
         />
       )}
+
+      {modalAlertData && <AlertModal {...modalAlertData} />}
     </>
   )
 }
 
 const Container = styled.div`
+  padding: 24px;
+  
   .card{
     border-radius: 12px;
     + .card{
       margin-top: 24px;
     }
 
-    .btn_ic{
-      &.more{
-        background: url(images/more.svg) no-repeat center center / 12px 12px;
-        &:hover{
-          background: ${Colors.gray_e} url(images/more.svg) no-repeat center center / 12px 12px;
-        }
-      }
-
-      &.add{
-        width: 30px;
-        height: 30px;
-        background: url(images/add.svg) no-repeat center center / 14px 14px;
-        &:hover{
-          background-color: ${Colors.gray_e5};
-        }
+    .btn.add{
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: url(images/add.svg) no-repeat center center / 14px 14px;
+      &:hover{
+        background-color: ${Colors.gray_e5};
       }
     }
 
@@ -464,19 +484,16 @@ const Container = styled.div`
         margin-left: 12px;
       }
     }
+
     &_cont{
       border-top: 1px solid ${Colors.gray_c};
     }
 
     &.category{
       .card_cont{
-        .popover{
-          padding-left: 4px;
-        }
-
         .grid{
           display: grid;
-          .type, .first{
+          .type, .second{
             border-right: 1px solid ${Colors.gray_e5};
           }
 
@@ -504,6 +521,7 @@ const Container = styled.div`
             .type{
               padding: 12px 18px;
             }
+
             li{
               &.grid{
                 grid-template-columns: 140px auto;
@@ -511,15 +529,11 @@ const Container = styled.div`
                   border-top: 1px solid ${Colors.gray_e5};
                 }
                 
-                .first{
-                  padding: 5px 9px 5px 18px;
-                  .popover{
-                    width: 34px;
-                    height: 30px;
-                  }
+                .second{
+                  padding: 5px 4px 5px 18px;
                 }
 
-                ul.second{
+                ul.third{
                   li{
                     &:nth-child(1){
                       padding: 0 3px 0 10px;
@@ -539,16 +553,13 @@ const Container = styled.div`
                         left: 3px;
                       }
                       p{
+                        margin-right: 4px;
+                        font-size: 13px;
                         position: relative;
                       }
-                      .popover{
-                        width: 28px;
-                        height: 24px;
-                        .btn_ic.more{
-                          background: url(images/more.svg) no-repeat center center / 12px 12px;
-                          &:hover{
-                            background: white url(images/more.svg) no-repeat center center / 12px 12px;
-                          }
+                      .btn.more{
+                        &:hover{
+                          background-color: rgba(255, 255, 255, .75);
                         }
                       }
                     }
@@ -556,7 +567,7 @@ const Container = styled.div`
                 }
               }
 
-              &:not(.grid){
+              &.add_second{
                 padding: 5px 10px;
               }
             }
@@ -571,15 +582,17 @@ const Container = styled.div`
         li{
           padding: 6px;
           div{
-            padding: 12px;
-            border-radius: 6px;
+            padding: 5px 12px 5px 20px;
+            border-radius: 20px;
             box-shadow: rgba(34, 34, 34, 0.1) 2px 2px 6px 2px;
             p{
-              padding-right: 24px;
+              padding-right: 12px;
               white-space: nowrap;
             }
-            .btn_ic.edit{
-              margin-right: 6px;
+            .btn30{
+              &:not(:hover){
+                background-color: transparent;
+              }
             }
           }
         }

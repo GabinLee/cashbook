@@ -7,7 +7,8 @@ import { useParams } from "react-router-dom"
 import FirstCategory, { SecondCategory, ThirdCategory } from "../../models/Category.model"
 import PaymentMethod from "../../models/PaymentMethod.model"
 import { Colors } from "../../style/Styles"
-import { addComma } from "../../utils/utils"
+import { addComma } from "../../utils/Utils"
+import BaseModal from "../BaseModal.modal"
 
 type EditHistory = {
   cashbookHistory?: CashbookHistory
@@ -24,51 +25,49 @@ export default function EditHistoryModal(props: EditHistory) {
   const [cateogryList] = useState<FirstCategory[]>(props.categoryList)
   const [paymentMethodList] = useState<PaymentMethod[]>(props.paymentMethodList)
 
-  const [selectedFirstCateogry, setSelectedFirstCategory] = useState<FirstCategory|null>(props.cashbookHistory ? props.cashbookHistory.firstCategory : null)
+  const [selectedFirstCateogry, setSelectedFirstCategory] = useState<FirstCategory>()
   const [date, setDate] = useState(props.cashbookHistory ? moment(props.cashbookHistory.date).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'))
   const [description, setDescription] = useState(props.cashbookHistory ? props.cashbookHistory.description : '')
   const [inputPrice, setInputPrice] = useState(props.cashbookHistory ? props.cashbookHistory.price : 0)
   const [price, setPrice] = useState(props.cashbookHistory ? props.cashbookHistory.price : 0)
   const [selectedSecondCategory, setSelectedSecondCateogory] = useState<SecondCategory|null>(props.cashbookHistory ? props.cashbookHistory.secondCategory : null)
   const [selectedThirdCategory, setSelectedThirdCategory] = useState<ThirdCategory|null>(props.cashbookHistory ? props.cashbookHistory.thirdCategory : null)
+  const [thirdCategoryDisabled, setThirdCategoryDisabled] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod|null>(props.cashbookHistory ? props.cashbookHistory.paymentMethod : null)
   const [receiptImage, setReceiptImage] = useState(props.cashbookHistory ? props.cashbookHistory.imageList : null)
   const [selectedReceiptImage, setSelectedReceiptImage] = useState<File[]|null>(null);
 
-  const [deleteImageIdArray, setDeleteImageIdArray] = useState<number[]>([])
+  const [deleteImageIdArray, setDeleteImageIdArray] = useState<number[]>([]);
   
-  const isValidConfirm = !(description && price && selectedFirstCateogry)
+  const isValidConfirm = !(description && price && selectedFirstCateogry);
 
 
   useEffect(() => {
-    tokenRef.current = localStorage.getItem('token') ?? ``
+    tokenRef.current = localStorage.getItem('token') ?? ``;
 
-    const first = cateogryList.find(v => v.name === "지출")
-
-    if(first) {
-      setSelectedFirstCategory(first)
+    if(paymentMethodList.length <= 1) {
+      setSelectedPaymentMethod(paymentMethodList[0])
     }
   }, [])
 
-  // useEffect(() => {
-  //   // setSelectedSecondCateogory(null)
-  //   // setSelectedThirdCategory(null)
+  useEffect(() => {
+    if(cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.find(v => v.id === selectedSecondCategory?.id)?.thirdCategoryList.length === 0){
+      setThirdCategoryDisabled(true);
+    } else{
+      setThirdCategoryDisabled(false);
+    }
+  }, [selectedSecondCategory])
+  
 
-  //   console.log('selectedFirstCateogry', selectedFirstCateogry)
-  //   console.log('selectedSecondCategory', selectedSecondCategory)
+  useEffect(() => {
+    if(cateogryList.length === 0) return;
 
-  //   if(selectedSecondCategory !== null){
-  //     setSelectedSecondCateogory(null)
-  //   }
-  // }, [selectedFirstCateogry])
-
-  // useEffect(() => {
-  //   // setSelectedThirdCategory(null)
-  //   console.log('selectedSecondCategory', selectedSecondCategory)
-  //   console.log('selectedThirdCategory', selectedThirdCategory)
-  // }, [selectedSecondCategory])
-
-
+    if(props.cashbookHistory !== undefined) { //수정
+      setSelectedFirstCategory(cateogryList.find(v => v.id === props.cashbookHistory?.firstCategory?.id))
+    } else { // 추가
+      setSelectedFirstCategory(cateogryList.find(v => v.name === "지출"))
+    }
+  }, [cateogryList, props.cashbookHistory])
 
   const addHistory = () => {
     if(selectedFirstCateogry === null) return;
@@ -77,7 +76,7 @@ export default function EditHistoryModal(props: EditHistory) {
     formData.append('date', date)
     formData.append('description', description)
     formData.append('price', `${price}`)
-    formData.append('firstCategoryId', `${selectedFirstCateogry.id}`)
+    formData.append('firstCategoryId', `${selectedFirstCateogry?.id}`)
     if(selectedSecondCategory !== null) {
       formData.append('secondCategoryId', `${selectedSecondCategory.id}`)
     }
@@ -117,7 +116,7 @@ export default function EditHistoryModal(props: EditHistory) {
     formData.append('date', date)
     formData.append('description', description)
     formData.append('price', `${price}`)
-    formData.append('firstCategoryId', `${selectedFirstCateogry.id}`)
+    formData.append('firstCategoryId', `${selectedFirstCateogry?.id}`)
     if(selectedSecondCategory !== null) {
       formData.append('secondCategoryId', `${selectedSecondCategory.id}`)
     }
@@ -162,13 +161,12 @@ export default function EditHistoryModal(props: EditHistory) {
   }
 
   // const deleteImage = (id:number) => {
-
   // }
 
 
   return(
-    <Container className="modal">
-      <div className="card">
+    <BaseModal>
+      <Container className="card">
         <h6 className="card_top">내역 {props.cashbookHistory ? '수정' : '추가'}</h6>
 
         <div className="card_middle">
@@ -194,6 +192,7 @@ export default function EditHistoryModal(props: EditHistory) {
           <div className="input_field flex ai-c">
             <p>일자</p>
             <input type="date"
+              required
               value={date}
               onChange={e => setDate(e.target.value)}
             />
@@ -202,6 +201,7 @@ export default function EditHistoryModal(props: EditHistory) {
           <div className="input_field flex ai-c">
             <p>내용</p>
             <input type="text"
+              required
               value={description}
               onChange={e => setDescription(e.target.value)}
             />
@@ -215,7 +215,7 @@ export default function EditHistoryModal(props: EditHistory) {
             />
           </div>
 
-          <div className="select_field flex ai-c">
+          <div className="select_field ai-c">
             <p>1차</p>
             <div className="select_box">
               <select
@@ -226,9 +226,13 @@ export default function EditHistoryModal(props: EditHistory) {
                   if(second){
                     setSelectedSecondCateogory(second)
                   }
+
+                  if(second?.thirdCategoryList.length === 1){
+                    setSelectedThirdCategory(second.thirdCategoryList[0])
+                  }
                 }}
               >
-                <option hidden></option>
+                <option value=""></option>
                 {cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.map((second, index) => (
                   <option key={`second${index}`} value={second.id}>{second.name}</option>
                 ))}
@@ -236,39 +240,54 @@ export default function EditHistoryModal(props: EditHistory) {
             </div>
           </div>
 
-          <div className="select_field flex ai-c">
+          <div className="select_field ai-c">
             <p>2차</p>
-            <div className="select_box">
-              <select
-                value={JSON.stringify(selectedThirdCategory)}
-                onChange={e => {
-                  setSelectedThirdCategory(JSON.parse(e.target.value))
-                }}
-              >
-                <option hidden></option>
-                {cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.find(v => v.id === selectedSecondCategory?.id)?.thirdCategoryList.map
-                ((third, index) => (
-                  <option key={`third${index}`} value={JSON.stringify(third)}>{third.name}</option>
-                ))}
-              </select>
-            </div>
+            {cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.find(v => v.id === selectedSecondCategory?.id)?.thirdCategoryList.length === 1 && (
+              <p>{cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.find(v => v.id === selectedSecondCategory?.id)?.thirdCategoryList.map(v => v.name)}</p>
+            )}
+            {cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.find(v => v.id === selectedSecondCategory?.id)?.thirdCategoryList.length !== 1 && (
+              <div className="select_box">
+                <select
+                  value={JSON.stringify(selectedThirdCategory)}
+                  onChange={e => {
+                    setSelectedThirdCategory(JSON.parse(e.target.value))
+                  }}
+                  disabled={thirdCategoryDisabled}
+                >
+                  <option value={''}></option>
+                  {cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.find(v => v.id === selectedSecondCategory?.id)?.thirdCategoryList.map
+                  ((third, index) => (
+                    <option key={`third${index}`} value={JSON.stringify(third)}>{third.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {/* 
+            {cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.find(v => v.id === selectedSecondCategory?.id)?.thirdCategoryList.length === 1 && (
+              <p>{cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.find(v => v.id === selectedSecondCategory?.id)?.thirdCategoryList.map(v => v.name)}</p>
+            )} */}
           </div>
 
-          <div className="select_field flex ai-c">
+          <div className="select_field ai-c">
             <p>결제수단</p>
-            <div className="select_box">
-              <select
-                value={JSON.stringify(selectedPaymentMethod)}
-                onChange={e => {
-                  setSelectedPaymentMethod(JSON.parse(e.target.value))
-                }}
-              >
-                <option hidden></option>
-                {paymentMethodList.map((paymentMethod, index) => (
-                  <option key={`method${index}`} value={JSON.stringify(paymentMethod)}>{paymentMethod.name}</option>
-                ))}
-              </select>
-            </div>
+            {paymentMethodList.length <= 1 && (
+              <p>{paymentMethodList.map(v => v.name)}</p>
+            )}
+            {paymentMethodList.length > 1 && (
+              <div className="select_box">
+                <select
+                  value={JSON.stringify(selectedPaymentMethod)}
+                  onChange={e => {
+                    setSelectedPaymentMethod(JSON.parse(e.target.value))
+                  }}
+                >
+                  <option value=""></option>
+                  {paymentMethodList.map((paymentMethod, index) => (
+                    <option key={`method${index}`} value={JSON.stringify(paymentMethod)}>{paymentMethod.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           {/* <div className="input_field flex ai-c">
@@ -302,11 +321,12 @@ export default function EditHistoryModal(props: EditHistory) {
             />
             <label htmlFor="receipt_img" className="add_img"/>
           </div>
+
           <ul className="img_list flex ai-s">
             {selectedReceiptImage !== null && selectedReceiptImage.map((img, index) => (
               <li key={`img${index}`}>
                 <img src={URL.createObjectURL(img)} alt="영수증" />
-                <button className="btn_ic btn20 clear dark"
+                <button className="btn_clear btn20 dark"
                   onClick={() => setSelectedReceiptImage(selectedReceiptImage.filter(v => v.name !== img.name))}
                 />
               </li>
@@ -314,7 +334,7 @@ export default function EditHistoryModal(props: EditHistory) {
             {receiptImage !== null && receiptImage.map((img, index) => (
               <li key={`img${index}`}>
                 <img src={`${process.env.REACT_APP_IMAGE_URL}receipt/${img.image}`} alt="영수증2(server)" />
-                <button className="btn_ic btn20 clear dark"
+                <button className="btn_clear btn20 dark"
                   onClick={() => {
                     setDeleteImageIdArray(deleteImageIdArray.concat(img.id))
                     setReceiptImage(receiptImage.filter(v => v.id != img.id))
@@ -338,15 +358,22 @@ export default function EditHistoryModal(props: EditHistory) {
             onClick={() => {props.cashbookHistory ? editHistory() : addHistory()}}
           >{props.cashbookHistory ? '수정' : '추가'}</button>
         </div>
-      </div>
-    </Container>
+      </Container>
+    </BaseModal>
   )
 }
 
 const Container = styled.div`
+  height: 100%;
+  max-height: 660px;
+  .card_top{
+    padding-bottom: 12px;
+  }
   .card_middle{
     width: 348px;
-    margin: 12px 0;
+    height: calc(100% - (145px + 12px));
+    margin-bottom: 12px;
+    overflow: auto;
     .group_radio{
       /* height: 40px; */
       justify-content: space-around;
@@ -387,6 +414,7 @@ const Container = styled.div`
       }
     }
     .input_field, .select_field{
+      height: 40px;
       margin-top: 24px;
       > p:nth-child(1){
         width: 60px;
@@ -424,7 +452,7 @@ const Container = styled.div`
               min-width: 60px;
               height: 90px;
             }
-            .btn_ic.clear{
+            .btn_clear{
               position: absolute;
               top: -4px;
               right: -4px;

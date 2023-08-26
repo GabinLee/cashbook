@@ -1,32 +1,43 @@
-import { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import Cashbook from "../models/Cashbook.model"
+import BaseModal from "./BaseModal.modal"
+import { useOutsideTouch } from "../utils/Hooks"
 
 type EditCashBook = {
   cashbook?: Cashbook
   onClickCancel: () => void
   addCashbook: (cashbookName: string, isGroup: boolean) => void
   editCashbook: (id: number, cashbookName: string, isGroup: boolean) => void
+  setShowEditCashbook: Dispatch<SetStateAction<boolean>>
 }
 
 export default function EditCashbookModal(props: EditCashBook) {
-  const [id, setId] = useState(-1)
-  const [cashbookName, setCashbookName] = useState('')
-  const [isGroup, setIsGroup] = useState(props.cashbook ? props.cashbook.isGroup : false)
+  const modalRef = useRef<HTMLDivElement>(null);
+  const isOutsideTouch = useOutsideTouch(modalRef);
 
-  const isValidConfirm = !cashbookName
+  const [id, setId] = useState(-1);
+  const [cashbookName, setCashbookName] = useState('');
+  const [isGroup, setIsGroup] = useState(false);
 
+  const isValidConfirm = !cashbookName;
 
   useEffect(() => {
-    if(!props.cashbook) return
+    if(!props.cashbook) return;
 
-    setId(props.cashbook.id)
-    setCashbookName(props.cashbook.name)
-  }, [props.cashbook])
+    setId(props.cashbook.id);
+    setCashbookName(props.cashbook.name);
+    setIsGroup(props.cashbook.isGroup);
+  }, [props.cashbook]);
+
+  useEffect(() => {
+      if(isOutsideTouch) props.setShowEditCashbook(false)
+    }, [isOutsideTouch]);
+
 
   return(
-    <Container className="modal">
-      <div className="card">
+    <BaseModal>
+      <Container className="card" ref={modalRef}>
         <h6 className="card_top">캐쉬북 {props.cashbook ? '수정' : '추가'}하기</h6>
 
         <div className="card_middle">
@@ -69,8 +80,8 @@ export default function EditCashbookModal(props: EditCashBook) {
             onClick={() => {props.cashbook ? props.editCashbook(id, cashbookName, isGroup) : props.addCashbook(cashbookName, isGroup)}}
           >{props.cashbook ? '수정' : '추가'}</button>
         </div>
-      </div>
-    </Container>
+      </Container>
+    </BaseModal>
   )
 }
 

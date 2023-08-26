@@ -3,7 +3,7 @@ import moment from "moment";
 import { Colors } from "../../style/Styles";
 import { useEffect, useRef, useState } from "react";
 import CashbookHistory from "../../models/CashbookHistory.model";
-import { addComma } from "../../utils/utils";
+import { addComma } from "../../utils/Utils";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import Cashbook from "../../models/Cashbook.model";
@@ -191,11 +191,28 @@ export default function CashbookHome() {
           <p>특별 지출 내역이 없습니다.</p>
         </div>
       </div> */}
+
+      {/* <div className="aa flex">
+        <div className="box">
+          <div className="flex ai-c">
+            <img src="images/nav_ic/cashbook_main.svg" alt="" />
+            
+            <div className="text-box">
+              <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry industry.</p>
+            </div>
+
+            <button>내역 추가</button>
+          </div>
+        </div>
+        <div className="box"></div>
+      </div> */}
     </Container>
   )
 }
 
 const Container = styled.div`
+  padding: 24px;
+  
   .month{
     display: flex;
     align-items: center;
@@ -268,4 +285,38 @@ const Container = styled.div`
       }
     }
   }
+
+  /* .aa{
+    background-color: lavender;
+    .box{
+      width: 50%;
+      padding: 0 12px;
+      &:nth-child(1){
+        background-color: palegoldenrod;
+      }
+
+      img{
+        width: 20px;
+        height: 20px;
+      }
+
+      .text-box{
+        width: calc(100% - 160px);
+        background-color: pink;
+        p{
+          padding: 6px 12px;
+          background-color: palegreen;
+
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+      }
+      
+      button{
+        width: 140px;
+        background-color: powderblue;
+      }
+    }
+  } */
 `

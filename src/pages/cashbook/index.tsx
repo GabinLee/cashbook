@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Container } from "./styles";
-import CashbookHome from "../../component/cashbook/HomeView";
-import ListView from "../../component/cashbook/ListView";
-import CashbookStatistics from "../../component/cashbook/StatisticsView";
-import SettingsView from "../../component/cashbook/SettingsView";
 import { useParams, useSearchParams } from "react-router-dom";
+import { Container } from "./styles";
+import CashbookHome from "../../components/cashbook/HomeView";
+import ListView from "../../components/cashbook/ListView";
+import CalendarView from "../../components/cashbook/CalendarView";
+import CashbookStatistics from "../../components/cashbook/StatisticsView";
+import SettingsView from "../../components/cashbook/SettingsView";
 
 
 export default function CashbookPage() {
@@ -41,11 +42,16 @@ export default function CashbookPage() {
           type="button"
           className={activeTab === 3 ? 'active' : ''}
           onClick={() => setSearchParams({tab: '3'})}
-        >Statistics</button>
+        >Calendar</button>
         <button
           type="button"
           className={activeTab === 4 ? 'active' : ''}
           onClick={() => setSearchParams({tab: '4'})}
+        >Statistics</button>
+        <button
+          type="button"
+          className={activeTab === 5 ? 'active' : ''}
+          onClick={() => setSearchParams({tab: '5'})}
         >Settings</button>
       </div>
 
@@ -58,10 +64,14 @@ export default function CashbookPage() {
       )}
 
       {activeTab === 3 && (
-        <CashbookStatistics />
+        <CalendarView />
       )}
 
       {activeTab === 4 && (
+        <CashbookStatistics />
+      )}
+
+      {activeTab === 5 && (
         <SettingsView />
       )}
     </Container>

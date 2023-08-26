@@ -14,10 +14,7 @@ export default class CashbookHistory{
   thirdCategoryId: number = -1
   paymentMethod: PaymentMethod|null = null
   paymentMethodId: number = -1
-  imageList: HistoryReceipt[] = []
-  
-
-  // firstCategoryId, secondCategoryId, thirdCategoryId, paymentMethodId
+  imageList: HistoryReceipt[] = [];
 }
 
 export class HistoryReceipt {
@@ -30,14 +27,6 @@ export type HistoryFilter = {
   isShowPopover: boolean
   itemList: FirstCategory[]
 }
-
-export const HistoryFilterList : HistoryFilter[] = [
-  // {name: '기간'},
-  {name: '거래유형', isShowPopover: false, itemList: []},
-  {name: '1차', isShowPopover: false, itemList: []},
-  {name: '2차', isShowPopover: false, itemList: []},
-  {name: '결제수단', isShowPopover: false, itemList: []}
-]
 
 // export const ScheduleList: Schedule[] = [
 //   {id: 5, nation: '태국', city: '푸켓', startDate: '2023.02.20', endDate: '2023.02.25'},

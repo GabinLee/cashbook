@@ -3,6 +3,7 @@ import styled from "styled-components"
 import PaymentMethod from "../../models/PaymentMethod.model"
 import axios from "axios"
 import { useParams } from "react-router-dom"
+import BaseModal from "../BaseModal.modal"
 // import CashbookHistory from "../../models/CashbookHistory.model"
 // import moment from "moment"
 
@@ -82,8 +83,8 @@ export default function EditPaymentMethodModal(props: EditPaymentMethod) {
 
 
   return(
-    <Container className="modal">
-      <div className="card">
+    <BaseModal>
+      <Container className="card">
         <h6 className="card_top">결제수단 {props.paymentMethod ? '수정' : '추가'}</h6>
         
         <div className="card_middle">
@@ -129,7 +130,7 @@ export default function EditPaymentMethodModal(props: EditPaymentMethod) {
           </div>
 
           {(type === 0 && false) && (
-            <div className="select_field flex">
+            <div className="select_field">
               <p>카드 대금 결제일</p>
               <div>
                 <div className="select_box">
@@ -163,8 +164,8 @@ export default function EditPaymentMethodModal(props: EditPaymentMethod) {
             onClick={() => props.paymentMethod ? editPaymentMethod() : addPaymentMethod()}
           >{props.paymentMethod ? '수정' : '추가'}</button>
         </div>
-      </div>
-    </Container>
+      </Container>
+    </BaseModal>
   )
 }
 

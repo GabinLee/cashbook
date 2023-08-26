@@ -8,7 +8,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import moment from "moment"
 import { Colors } from "../../style/Styles"
 import CashbookHistory from "../../models/CashbookHistory.model"
-import { addComma } from "../../utils/utils"
+import { addComma } from "../../utils/Utils"
 
 
 export default function CashbookStatistics() {
@@ -34,8 +34,9 @@ export default function CashbookStatistics() {
   const [expenseBgColor, setExpenseBgColor] = useState<string[]>([]) 
   const [incomeBgColor, setIncomeBgColor] = useState<string[]>([])
   const [savingBgColor, setSavingBgColor] = useState<string[]>([])
-  const backgroundColor5 = ['#fe7877bf', '#f7d021bf','#2dcc70bf', '#5fa9ffbf']
-  const backgroundColor9 = ['#fe7877bf', '#fd925ebf', '#f7d021bf', '#88e18ebf', '#2dcc70bf', '#99e1ffbf', '#5fa9ffbf', '#c29effbf', '#fb88ffbf']
+  const backgroundColor5 = ['#fe7877bf', '#f7d021bf','#2dcc70bf', '#5fa9ffbf', '#c29effbf']
+  // const backgroundColorMany = ['#fe7877bf', '#fd925ebf', '#f7d021bf', '#88e18ebf', '#2dcc70bf', '#99e1ffbf', '#5fa9ffbf', '#c29effbf', '#8e77bbbf', '#fb88ffbf', '#55CDFFbf', '#6AD922bf', '#B79470bf']
+  const backgroundColorMany = ['#fe7877bf', '#fd925ebf', '#FCB100bf', '#f7d021bf', '#88e18ebf', '#6AD922bf', '#2dcc70bf', '#99e1ffbf','#55CDFFbf', '#5fa9ffbf', '#c29effbf', '#8e77bbbf', '#fb88ffbf', '#B79470bf']
 
 
   useEffect(() => {
@@ -62,6 +63,7 @@ export default function CashbookStatistics() {
     cateogryList.filter(first => first.name === "수입").forEach(v => {
       setIncomeSecondList(v.secondCategoryList.map(v => v.name))
     })
+    
     cateogryList.filter(first => first.name === "저축").forEach(v => {
       setSavingSecondList(v.secondCategoryList.map(v => v.name))
     })
@@ -73,17 +75,17 @@ export default function CashbookStatistics() {
     if(expenseSecondList.length < 5) {
       setExpenseBgColor(backgroundColor5)
     } else{
-      setExpenseBgColor(backgroundColor9)
+      setExpenseBgColor(backgroundColorMany)
     }
     if(incomeSecondList.length < 5) {
       setIncomeBgColor(backgroundColor5)
     } else{
-      setIncomeBgColor(backgroundColor9)
+      setIncomeBgColor(backgroundColorMany)
     }
     if(savingSecondList.length < 5) {
       setSavingBgColor(backgroundColor5)
     } else{
-      setSavingBgColor(backgroundColor9)
+      setSavingBgColor(backgroundColorMany)
     }
 
     setExpensePriceArray(expenseSecondList.map(category => (
@@ -157,6 +159,7 @@ export default function CashbookStatistics() {
       },
     ],
   }
+
   const incomeData = {
     labels: incomeSecondList,
     datasets: [
@@ -196,53 +199,62 @@ export default function CashbookStatistics() {
 
       <ul className="flex chart_group">
         <li className="card">
-          {historyExpense.length !== 0 ?
+          {historyExpense.length === 0 && (
+            <p className="data-none">지출 내역이 없습니다.</p>
+          )}
+          {historyExpense.length !== 0 && (
             <>
-            <div className="chart_bx">
-              <div className="chart_wrap">
-                <Pie
-                  data={expenseData}
-                />
+              <div className="chart_bx">
+                <div className="chart_wrap">
+                  <Pie
+                    data={expenseData}
+                  />
+                </div>
               </div>
-            </div>
-            <ul className="list_bx">
-              {expenseSecondList.map((item, index) => (
-                <li key={`item${index}`} className="flex">
-                  <p className="flex1">{item}</p>
-                  <p>{addComma(historyExpense.filter(historyItem => historyItem.secondCategory?.name === item).map(v => v.price).reduce((price, curr) => price + curr, 0))}</p>
-                  <p className="badge flex-c fs12" style={{backgroundColor: expenseBgColor[index]}}>{Math.round((historyExpense.filter(historyItem => historyItem.secondCategory?.name === item).map(v => v.price).reduce((price, curr) => price + curr, 0) / historyExpense.map(v => v.price).reduce((price, curr) => price + curr, 0))*100)}%</p>
-                </li>
-              ))}
-            </ul>
+              <ul className="list_bx">
+                {expenseSecondList.map((item, index) => (
+                  <li key={`item${index}`} className="flex">
+                    <p className="flex1">{item}</p>
+                    <p>{addComma(historyExpense.filter(historyItem => historyItem.secondCategory?.name === item).map(v => v.price).reduce((price, curr) => price + curr, 0))}</p>
+                    <p className="badge flex-c fs12" style={{backgroundColor: expenseBgColor[index]}}>{Math.round((historyExpense.filter(historyItem => historyItem.secondCategory?.name === item).map(v => v.price).reduce((price, curr) => price + curr, 0) / historyExpense.map(v => v.price).reduce((price, curr) => price + curr, 0))*100)}%</p>
+                  </li>
+                ))}
+              </ul>
             </>
-          : <p className="data-none">지출 내역이 없습니다.</p>}
+          )}
         </li>
 
         <li className="card">
-          {historySaving.length !== 0 ?
+          {historySaving.length === 0 && (
+            <p className="data-none">저축 내역이 없습니다.</p>
+          )}
+          {historySaving.length !== 0 && (
             <>
-            <div className="chart_bx">
-              <div className="chart_wrap">
-                <Pie
-                  data={savingData}
-                />
+              <div className="chart_bx">
+                <div className="chart_wrap">
+                  <Pie
+                    data={savingData}
+                  />
+                </div>
               </div>
-            </div>
-            <ul className="list_bx">
-              {savingSecondList.map((item, index) => (
-                <li key={`item${index}`} className="flex">
-                  <p className="flex1">{item}</p>
-                  <p>{addComma(historySaving.filter(historyItem => historyItem.secondCategory?.name === item).map(v => v.price).reduce((price, curr) => price + curr, 0))}</p>
-                  <p className="badge flex-c fs12" style={{backgroundColor: savingBgColor[index]}}>{Math.round((historySaving.filter(historyItem => historyItem.secondCategory?.name === item).map(v => v.price).reduce((price, curr) => price + curr, 0) / historySaving.map(v => v.price).reduce((price, curr) => price + curr, 0))*100)}%</p>
-                </li>
-              ))}
-            </ul>
+              <ul className="list_bx">
+                {savingSecondList.map((item, index) => (
+                  <li key={`item${index}`} className="flex">
+                    <p className="flex1">{item}</p>
+                    <p>{addComma(historySaving.filter(historyItem => historyItem.secondCategory?.name === item).map(v => v.price).reduce((price, curr) => price + curr, 0))}</p>
+                    <p className="badge flex-c fs12" style={{backgroundColor: savingBgColor[index]}}>{Math.round((historySaving.filter(historyItem => historyItem.secondCategory?.name === item).map(v => v.price).reduce((price, curr) => price + curr, 0) / historySaving.map(v => v.price).reduce((price, curr) => price + curr, 0))*100)}%</p>
+                  </li>
+                ))}
+              </ul>
             </>
-          : <p className="data-none">저축 내역이 없습니다.</p>}
+          )}
         </li>
 
         <li className="card">
-          {historyIncome.length !== 0 ?
+          {historyIncome.length === 0 && (
+            <p className="data-none">수입 내역이 없습니다.</p>
+          )}
+          {historyIncome.length !== 0 && (
             <>
             <div className="chart_bx">
               <div className="chart_wrap">
@@ -261,7 +273,7 @@ export default function CashbookStatistics() {
               ))}
             </ul>
             </>
-          : <p className="data-none">수입 내역이 없습니다.</p>}
+            )}
         </li>
       </ul>
       <div>
@@ -271,6 +283,8 @@ export default function CashbookStatistics() {
 }
 
 const Container = styled.div`
+  padding: 24px;
+  
   .month{
     width: 140px;
     height: 40px;

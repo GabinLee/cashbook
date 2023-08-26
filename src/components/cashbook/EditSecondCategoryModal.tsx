@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import FirstCategory, { SecondCategory } from "../../models/Category.model";
 import axios from "axios";
+import BaseModal from "../BaseModal.modal";
 
 type EditSecondCategory = {
   firstCategory? : FirstCategory
@@ -68,8 +69,8 @@ export default function EditSecondCategoryModal(props: EditSecondCategory) {
 
 
   return (
-    <EditSecondDiv className="modal">
-      <div className="card">
+    <BaseModal>
+      <EditSecondDiv className="card">
         <h6 className="card_top">[{props.firstCategory?.name}] 1차 카테고리 {props.secondCategory ? '수정' : '추가'}</h6>
 
         <div className="card_middle">
@@ -90,17 +91,19 @@ export default function EditSecondCategoryModal(props: EditSecondCategory) {
             className="contained main"
             disabled={isValidConfirm}
             onClick={e => {props.secondCategory ? editSecondCategory() : addSecondCategory()}}
-          >확인</button>
+          >{props.secondCategory ? '수정' : '추가'}</button>
         </div>
-      </div>
-    </EditSecondDiv>
+      </EditSecondDiv>
+    </BaseModal>
   )
 }
 
 const EditSecondDiv = styled.div`
   .card_middle{
     input{
-      width: 240px;
+      width: 100%;
+      min-width: 240px;
+      max-width: 360px;
       height: 40px;
     }
   }

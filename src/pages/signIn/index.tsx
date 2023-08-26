@@ -1,31 +1,54 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Container } from "./styles";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import SignUpModal from "../../component/SignUpModal";
+import SignUpModal from "../../components/SignUpModal";
+import { useAppDispatch, useAppSelector } from "../../store";
+import { setToken, setUser } from "../../store/appSlice";
+// import User from "../../models/UserModel";
+// import { useSelector } from "react-redux";
 
 
 export default function SignInPage() {
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const [userId, setUserId] = useState('')
-  const [password, setPassword] = useState('')
-  const [showSignUp, setShowSignUp] = useState(false)
+  const dispatch = useAppDispatch();
+  
+  const [searchParams] = useSearchParams();
 
-  const isValidSignIn = !(userId && password)
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
+  const [showSignUp, setShowSignUp] = useState(false);
+
+  const isValidSignIn = !(userId && password);
 
 
   useEffect(() => {
     const code = searchParams.get('code')
 
     if(code !== null) {
-      console.log('코드', code)
-      signinKakao(code)
+      console.log('코드', code);
+      signinKakao(code);
     }
   }, [searchParams])
 
+  const signIn = () => {
+    console.log('signin');
+    axios.post(`${process.env.REACT_APP_HOST_URL}v1/auth/token`, {
+      type: 'uid',
+      uid: userId,
+      password: password,
+      redirectUri: 'http://localhost:3000/sign-in?type=kakao'
+    })
+    .then(response => {
+      if(response.data.success){
+        localStorage.setItem('token', response.data.data.token);
+        dispatch(setToken(localStorage.getItem('token')));
+      } else{
+        alert('error')
+      }
+    }).catch(error => console.log(error))
+  }
+
   const signinKakao = (code: string) => {
-    console.log('signinKakao')
     axios.post(`${process.env.REACT_APP_HOST_URL}v1/auth/token`, {
       type: 'kakao',
       code: code
@@ -33,32 +56,8 @@ export default function SignInPage() {
     .then(response => {
       console.log('카카오 로그인 성공', response.data)
       if(response.data.success){
-        localStorage.setItem('token', response.data.data.token)
-
-        navigate('/')
-        getUser()
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
-  }
-
-  const getUser = () => {
-    console.log('getUser')
-    const token = localStorage.getItem('token')
-
-    if (token === null) return
-
-    axios.get(`${process.env.REACT_APP_HOST_URL}v1/user/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      console.log('사용자', response.data)
-      if(response.data.success){
-        localStorage.setItem('user', JSON.stringify(response.data.data))
-
+        localStorage.setItem('token', response.data.data.token);
+        dispatch(setToken(localStorage.getItem('token')));
       } else{
         alert('error')
       }
@@ -69,30 +68,12 @@ export default function SignInPage() {
     console.log('onClickLoginKakao')
 
     const REST_API_KEY = '67a2cfcec81c116238e7fd3459c119e8';
-    // const REDIRECT_URI = 'http://localhost:3000/sign-in?type=kakao';
-    const REDIRECT_URI = `https://cash-book.netlify.app/sign-in?type=kakao`;
+    const REDIRECT_URI = 'http://localhost:3000/sign-in?type=kakao';
+    // const REDIRECT_URI = `https://cash-book.netlify.app/sign-in?type=kakao`;
     
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`
   }
 
-  const signIn = () => {
-    axios.post(`${process.env.REACT_APP_HOST_URL}v1/auth/token`, {
-      type: 'uid',
-      uid: userId,
-      password: password
-    })
-    .then(response => {
-      if(response.data.success){
-        console.log('로그인 성공', response.data.data)
-
-        localStorage.setItem('token', response.data.data.token)
-        navigate('/')
-        getUser()
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
-  }
 
   return (
     <>
@@ -117,8 +98,6 @@ export default function SignInPage() {
               />
             </div>
           </div>
-
-          {/* guest / abcd1234! */}
 
           <button
             type="button"

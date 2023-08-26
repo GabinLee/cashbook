@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import FirstCategory, { SecondCategory, ThirdCategory } from "../../models/Category.model";
 import axios from "axios";
+import BaseModal from "../BaseModal.modal";
 
 type EditThirdCategory = {
   firstCategory? : FirstCategory
@@ -70,8 +71,8 @@ export default function EditThirdCategoryModal(props: EditThirdCategory) {
 
 
   return (
-    <EditThirdDiv className="modal">
-      <div className="card">
+    <BaseModal>
+      <EditThirdDiv className="card">
         <h6 className="card_top">[{props.firstCategory?.name} - {props.secondCateagory?.name}] 2차 카테고리 {props.thirdCategory ? '수정' : '추가'}</h6>
 
         <div className="card_middle">
@@ -94,15 +95,17 @@ export default function EditThirdCategoryModal(props: EditThirdCategory) {
             onClick={() => {props.thirdCategory ? editThirdCategory() : addThirdCateogry()}}
           >{props.thirdCategory ? '수정' : '추가'}</button>
         </div>
-      </div>
-    </EditThirdDiv>
+      </EditThirdDiv>
+    </BaseModal>
   )
 }
 
 const EditThirdDiv = styled.div`
   .card_middle{
     input{
-      width: 240px;
+      width: 100%;
+      min-width: 240px;
+      max-width: 360px;
       height: 40px;
     }
   }

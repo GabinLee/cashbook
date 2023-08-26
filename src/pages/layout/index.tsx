@@ -1,50 +1,66 @@
 import axios from "axios";
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Container } from "./styles";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Cashbook from "../../models/Cashbook.model";
-import EditCashbookModal from "../../component/EditCashbookModal";
+import { useAppDispatch, useAppSelector } from "../../store";
+import { setToken, setUser } from "../../store/appSlice";
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
+import { DraggableNavItem } from "../../components/DraggableNavItem";
+
 
 
 export default function LayoutPage() {
-  const {id} = useParams()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const tokenRef = useRef('')
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [cashbookList, setCashbookList] = useState<Cashbook[]>([])
-  const [userNickname, setUserNickname] = useState('')
-  const [userSocialId, setUserSocialId] = useState('')
-  
-  const [showEditCashbook, setShowEditCashbook] = useState(false)
-  const [selectedCashbook, setSelectedCashbook] = useState<Cashbook>()
+  const dispatch = useAppDispatch();
 
+  const token = useAppSelector(state => state.app.token);
+  const user = useAppSelector(state => state.app.user);
+
+  const [cashbookList, setCashbookList] = useState<Cashbook[]>([]);
+
+  // for drag overlay
+  const [isDraggingNav, setIsDraggingNav] = useState<Cashbook>()
 
   useEffect(() => {
-    tokenRef.current = localStorage.getItem('token') ?? ''
+    getCashbookList();
+    getUser();
   }, [])
 
-  useEffect(() => {
-    if(localStorage.getItem('user') !==  null && localStorage.getItem('user') !== ''){
-      const user = JSON.parse(`${localStorage.getItem('user')}`)
 
-      setUserNickname(user.nickname)
-      setUserSocialId(user.socialId)
-    }
+  const getUser = () => {
+    axios.get(`${process.env.REACT_APP_HOST_URL}v1/user/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      console.log('layout - getUser')
+      if(response.data.success){
+        dispatch(setUser({nickname: response.data.data.nickname, name: response.data.data.name, email: response.data.data.email}));
+      } else{
+        alert('error')
+      }
+    }).catch(error => console.log(error))
+  }
 
-    if(tokenRef.current !== '' && tokenRef.current !== null){
-      getCashbookList();
-      getUser();
-    }
-  }, [id])
+  const signout = () => {
+    localStorage.removeItem('token');
+    dispatch(setToken(null));
+    dispatch(setUser(null));
+  }
 
   const getCashbookList = () => {
     axios.get(`${process.env.REACT_APP_HOST_URL}v1/user/me/cash-book`, {
       headers: {
-        Authorization: `Bearer ${tokenRef.current}`
+        Authorization: `Bearer ${token}`
       }
     })
     .then(response => {
+      console.log('layout - getCashbookList')
       if(response.data.success){
         setCashbookList(response.data.data)
       } else{
@@ -53,93 +69,40 @@ export default function LayoutPage() {
     }).catch(error => console.log(error))
   }
 
-  const getUser = () => {
-    axios.get(`${process.env.REACT_APP_HOST_URL}v1/user/me`, {
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success){
-        setUserNickname(response.data.data.nickname)
-        setUserSocialId(response.data.data.socialId)
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
+  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event
+    setIsDraggingNav(cashbookList.find((item) => item.id === active.id))
   }
 
-  const signout = () => {
-    localStorage.setItem('token', '')
-    setUserNickname('')
-    setUserSocialId('')
-    navigate('/sign-in')
-  }
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over) return;
 
-  const addCashbook = (cashbookName: string, isGroup: boolean) => {
-    axios.post(`${process.env.REACT_APP_HOST_URL}v1/cash-book`, {
-      name: cashbookName,
-      isGroup: isGroup
-    }, {
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success){
-        console.log('addCashbook 성공')
-        setShowEditCashbook(false)
-        getCashbookList()
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
-  }
+    if (active.id !== over.id) {
+      setCashbookList((items) => {
+        const activeIndex = items.findIndex(v => v.id === active.id);
+        const overIndex = items.findIndex(v => v.id === over!.id);
 
-  const editCashbook = (id: number, cashbookName: string, isGroup: boolean) => {
-    axios.patch(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}`, {
-      id: id,
-      name: cashbookName,
-      isGroup: isGroup
-    }, {
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success){
-        console.log('editCashbook')
-        setShowEditCashbook(false)
-        setSelectedCashbook(undefined)
-        getCashbookList()
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
-  }
+        return arrayMove(items, activeIndex, overIndex)
+      });
+    }
 
-  const deleteCashbook = (id: number) => {
-    axios.delete(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}`, {
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success) {
-        console.log('deleteCashbook')
-        getCashbookList()
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
-  }
+    setIsDraggingNav(undefined);
+  }, []);
+
+  const handleDragCancel = useCallback(() => {
+    setIsDraggingNav(undefined)
+  }, []);
 
 
   return (
     <Container>
       <div className="header_nav">
         <header>
-          <button type="button" className=""
+          <button type="button"
             onClick={e => navigate('/')}
           >
             <img src="images/logo_white.svg" alt="로고 이미지" />
@@ -147,63 +110,53 @@ export default function LayoutPage() {
         </header>
 
         <nav>
-          {cashbookList.map((cashbook, nIndex) => (
-            <div
-              key={`navCashbook ${nIndex}`}
-              className={`btn_nav${(cashbook.isActive || (location.pathname === `/${cashbook.id}`)) ? ' active' : ''}`}
-              onClick={e => {
-                navigate(`/${cashbook.id}`)
-              }}
-              onMouseOver={e => {
-                setCashbookList(cashbookList.map((v, i) => {
-                  if(nIndex === i) v.isActive = true
-                  return v
-                }))
-              }}
-              onMouseOut={e => {
-                setCashbookList(cashbookList.map((v, i) => {
-                  if(nIndex === i) v.isActive = false
-                  return v
-                }))
-              }}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+          >
+            <SortableContext items={cashbookList}
+              strategy={rectSortingStrategy}
             >
-              <img src={`images/nav_ic/cashbook${(cashbook.isActive || (location.pathname === `/${cashbook.id}`)) ? '_main' : ''}.svg`} alt={cashbook.name} />
-              <span className="flex1">{cashbook.name}</span>
-
-              <div className="popover">
-                <button type="button" className={`btn_ic more${cashbook.isShowMoreMenu ? ' active' : ''}`}
-                  onClick={e => {
-                    e.stopPropagation()
-                    setCashbookList(cashbookList.map(value => {
-                      if(value.id === cashbook.id) value.isShowMoreMenu = !value.isShowMoreMenu
-                      return value
-                    }))
-                  }}
-                />
-                <div className="popover_menu">
-                  <button
-                    type="button"
-                    onClick={e => {
-                      e.stopPropagation()
-                      setShowEditCashbook(true)
-                      setSelectedCashbook(cashbook)
-                      setCashbookList(cashbookList.map(value => {
-                        value.isShowMoreMenu = false
-                        return value
+              <ul>
+                {cashbookList.map((cashbook, nIndex) => (
+                  <DraggableNavItem
+                    key={cashbook.id}
+                    cashbook={cashbook}
+                    classname={`${(cashbook.isActive || (location.pathname === `/${cashbook.id}`)) ? 'active' : ''}`}
+                    onClick={() => {
+                      navigate(`/${cashbook.id}`)
+                    }}
+                    onMouseOver={() => {
+                      setCashbookList(cashbookList.map((v, i) => {
+                        if(nIndex === i) v.isActive = true
+                        return v
                       }))
                     }}
-                  >수정</button>
-                  <button
-                    type="button"
-                    onClick={e => {
-                      e.stopPropagation()
-                      deleteCashbook(cashbook.id)
+                    onMouseLeave={() => {
+                      setCashbookList(cashbookList.map((v, i) => {
+                        if(nIndex === i) v.isActive = false
+                        return v
+                      }))
                     }}
-                  >삭제</button>
-                </div>
-              </div>
-            </div>
-          ))}
+                  />
+                ))}
+              </ul>
+            </SortableContext>
+
+            
+            {/* <DraggableOverlay
+              dropAnimation={null}
+            >
+              {isDraggingNav ? 
+                <DraggableNavItem
+                  cashbook={isDraggingNav}
+                />
+              : null}
+            </DraggableOverlay> */}
+          </DndContext>
 
           {/* <button
             type="button"
@@ -218,21 +171,9 @@ export default function LayoutPage() {
               <span>설정</span>
           </button> */}
         </nav>
-
-        <div className="area add_cashbook">
-          <button type="button" className="contained main"
-            onClick={() => {
-              setShowEditCashbook(true)
-              setCashbookList(cashbookList.map(value => {
-                value.isShowMoreMenu = false
-                return value
-              }))
-            }}
-          >캐쉬북 추가하기</button>
-        </div>
         
         <div className="area profile flex ai-c">
-          <p className="flex1">{userNickname}</p>
+          <p className="flex1">{user?.nickname}</p>
           <button className="fs12"
             onClick={() => signout()}
           >로그아웃</button>
@@ -241,17 +182,6 @@ export default function LayoutPage() {
 
       <Outlet />
 
-      {showEditCashbook && (
-        <EditCashbookModal
-          cashbook={selectedCashbook}
-          onClickCancel={() => {
-            setShowEditCashbook(false)
-            setSelectedCashbook(undefined)
-          }}
-          addCashbook={addCashbook}
-          editCashbook={editCashbook}
-        />
-      )}
     </Container>
   )
 }

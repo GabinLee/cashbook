@@ -1,6 +1,7 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import styled from "styled-components"
+import BaseModal from "./BaseModal.modal"
 
 type SignUp = {
   onClickClose: () => void
@@ -75,8 +76,8 @@ export default function SignUpModal(props: SignUp) {
 
 
   return (
-    <SignUpDiv className="modal">
-      <div className="card">
+    <BaseModal>
+      <SignUpDiv className="card">
         <h6 className="card_top">회원가입</h6>
 
         <div className="card_middle">
@@ -174,34 +175,32 @@ export default function SignUpModal(props: SignUp) {
             onClick={signUp}
           >가입하기</button>
         </div>
-      </div>
-    </SignUpDiv>
+      </SignUpDiv>
+    </BaseModal>
   )
 }
 
 const SignUpDiv = styled.div`
-  .card{
-    width: 360px;
+  width: 360px;
 
-    &_middle{
-      .input_field{
-        .light_main{
-          margin-left: 6px;
-          padding: 0 12px;
-        }
+  &_middle{
+    .input_field{
+      .light_main{
+        margin-left: 6px;
+        padding: 0 12px;
+      }
 
-        + .input_field{
-          margin-top: 12px;
-        }
+      + .input_field{
+        margin-top: 12px;
       }
     }
+  }
 
-    &_bottom{
-      margin-top: 12px;
-      button{
-        &.main{
-          flex: 2;
-        }
+  &_bottom{
+    margin-top: 12px;
+    button{
+      &.main{
+        flex: 2;
       }
     }
   }
