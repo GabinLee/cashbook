@@ -5,7 +5,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import FirstCategory, { SecondCategory, ThirdCategory } from "../../models/Category.model";
 import PaymentMethod from "../../models/PaymentMethod.model";
-import { ModalData } from "../../models/AlertModal.model";
+import { ModalData } from "../../models/Modal.model";
 import EditSecondCategoryModal from "./EditSecondCategoryModal";
 import EditThirdCategoryModal from "./EditThirdCategoryModal";
 import EditPaymentMethodModal from "./EditPaymentMethodModal";

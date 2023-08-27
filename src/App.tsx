@@ -32,7 +32,6 @@ function App() {
   }, [])
 
   useEffect(() => {
-    
     if(token === undefined) return;
 
     if(token !== null){

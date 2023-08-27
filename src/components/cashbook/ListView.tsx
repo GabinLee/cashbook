@@ -1,168 +1,17 @@
-import { useEffect, useRef, useState } from "react"
 import moment from "moment"
-import axios from "axios"
-import { useParams, useSearchParams } from "react-router-dom"
 import styled from "styled-components"
 import { Colors } from "../../style/Styles"
 import EditHistoryModal from "./EditHistoryModal"
-import CashbookHistory from "../../models/CashbookHistory.model"
-import FirstCategory from "../../models/Category.model"
-import PaymentMethod from "../../models/PaymentMethod.model"
 import { addComma } from "../../utils/Utils"
 import PopoverFilter from "../popover/PopoverFilter"
 import AlertModal from "../AlertModal"
 import ReactPaginate from "react-paginate"
 import ListViewModel from "./List.viewmodel"
-import { ModalData } from "../../models/AlertModal.model"
 
 
 export default function ListView() {
   
-  const {id} = useParams();
-  const tokenRef = useRef('');
-
   const viewModel = ListViewModel();
-  
-
-  const [cateogryList, setCategoryList] = useState<FirstCategory[]>([]);
-  const [paymentMethodList, setPaymentMethodList] = useState<PaymentMethod[]>([]);
-  
-
-  const [month, setMonth] = useState(moment().format('YYYY-MM'));
-
-  const expenseList = viewModel.historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategory?.name === '지출');
-  const incomeList = viewModel.historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategory?.name === '수입');
-  const savingList = viewModel.historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategory?.name === '저축');
-
-  const [totalExpense, setTotalExpense] = useState(0);
-  const [totalSaving, setTotalSaving] = useState(0);
-  const [totalIncome, setTotalIncome] = useState(0);
-
-  const [showFilterPopover, setShowFilterPopover] = useState(0);
-  const [selectedFirstIdArray, setSelectedFirstIdArray] = useState<number[]>([]);
-  const [selectedSecondIdArray, setSelectedSecondIdArray] = useState <number[]>([]);
-  const [selectedPaymentMethodIdArray, setSelectedPaymentMethodIdArray] = useState<number[]>([]);
-
-  const [selectedHistory, setSelectedHistory] = useState<CashbookHistory>();
-  const [showEditHistoryModal, setShowEditHistoryModal] = useState(false);
-
-  const [filteredHistoryList, setFilteredHistoryList] = useState<CashbookHistory[]>([]);
-
-  const [modalAlertData, setModalAlertData] = useState<ModalData>();
-
-
-  useEffect(() => {
-    tokenRef.current = localStorage.getItem('token') ?? '';
-  }, [])
-
-  useEffect(() => {
-    getCategory();
-    getPaymentMethod();
-
-    setMonth(moment().format('YYYY-MM'));
-  }, [id])
-
-  
-
-  useEffect(() => {
-    setFilteredHistoryList(viewModel.historyList.filter(v => moment(v.date).format('YYYY-MM') === month));
-
-    setTotalExpense(expenseList.map(v => v.price).reduce((price, cur) => price + cur, 0))
-
-    setTotalIncome(incomeList.map(v => v.price).reduce((price, cur) => price + cur, 0))
-    
-    setTotalSaving(savingList.map(v => v.price).reduce((price, cur) => price + cur, 0))
-  }, [id, viewModel.historyList, month])
-
-  // filter default
-  useEffect(() => {
-    // filter_first default
-    setSelectedFirstIdArray(cateogryList.map(v => v.id));
-
-    // filter_second default
-    if(selectedSecondIdArray.length === 0){
-      setSelectedSecondIdArray(selectedSecondIdArray.concat(...cateogryList.filter(first => cateogryList.map(v => v.id).includes(first.id)).map(first => first.secondCategoryList.map(second => second.id))));
-    };
-
-    // 결제수단 default
-    setSelectedPaymentMethodIdArray(paymentMethodList.map(v => v.id));
-  }, [cateogryList, viewModel.historyList, paymentMethodList])
-
-  // first 체크에 따른 filter_second list
-  useEffect(() => {
-    setSelectedSecondIdArray(cateogryList.filter(first => selectedFirstIdArray.includes(first.id)).map(first => first.secondCategoryList.map(second => second.id)).reduce((acc, cur) => acc.concat(cur), []));
-  }, [selectedFirstIdArray])
-
-  // 거래유형, 1차, 결제수단 체크여부에 따른 내역 필터
-  useEffect(() => {
-    // setFilteredHistoryList(historyList.filter(v => {
-    //   return selectedFirstIdArray.includes(v.firstCategoryId)
-    // }).filter(v => {
-    //   return selectedSecondIdArray.includes(v.secondCategoryId)
-    // }).filter(v => {
-    //   if(v.paymentMethod !== null){
-    //     return selectedPaymentMethodIdArray.includes(v.paymentMethod.id)
-    //   }
-    // }));
-  }, [selectedFirstIdArray, selectedSecondIdArray, selectedPaymentMethodIdArray])
-
-
-  const getCategory = () => {
-    axios.get(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/trade-category`, {
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success){
-        console.log('카테고리 조회 성공', response.data.data)
-
-        setCategoryList(response.data.data);
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
-  }
-
-  const getPaymentMethod = () => {
-    axios.get(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/payment-method`, {
-      params: {
-        cashBookId: id
-      },
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success){
-        console.log('결제수단 조회 성공', response.data.data)
-
-        setPaymentMethodList(response.data.data);
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
-  }
-
-  
-
-  const deleteHistory = (id: number) => {
-    axios.delete(`${process.env.REACT_APP_HOST_URL}v1/cash-book-detail/${id}`, {
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success){
-        console.log('내역 삭제 성공', response.data.data)
-    
-        viewModel.getHistory();
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
-  }
-
 
   return (
     <>
@@ -170,22 +19,22 @@ export default function ListView() {
         <div className="area summary flex">
           <div className="input_field standard flex1">
             <input type="month"
-              value={month}
-              onChange={e => setMonth(e.target.value)}
+              value={viewModel.month}
+              onChange={e => viewModel.setMonth(e.target.value)}
             />
           </div>
 
           <div className="card expense">
             <p>지출</p>
-            <h6>{addComma(totalExpense)}</h6>
+            <h6>{addComma(viewModel.totalExpense)}</h6>
           </div>
           <div className="card saving">
             <p>저축</p>
-            <h6>{addComma(totalSaving)}</h6>
+            <h6>{addComma(viewModel.totalSaving)}</h6>
           </div>
           <div className="card income">
             <p>수입</p>
-            <h6>{addComma(totalIncome)}</h6>
+            <h6>{addComma(viewModel.totalIncome)}</h6>
           </div>
         </div>
 
@@ -193,26 +42,42 @@ export default function ListView() {
           <ul className="flex1 flex flex-wrap filter_list">
             <PopoverFilter
               filterName="거래유형"
-              isShowFilterPopover={showFilterPopover === 1}
+              isShowFilterPopover={viewModel.showFilterPopover === 1}
               onClickShowPopover={() => {
-                if(showFilterPopover !== 1) {
-                  setShowFilterPopover(1)
+                if(viewModel.showFilterPopover !== 1) {
+                  viewModel.setShowFilterPopover(1)
                 } else{
-                  setShowFilterPopover(0)
+                  viewModel.setShowFilterPopover(0)
                 }
               }}
-              onClickHidePopover={() => setShowFilterPopover(0)}
+              onClickHidePopover={() => viewModel.setShowFilterPopover(0)}
               classname="first flex ai-c jc-sb"
             >
-              {cateogryList.map((first, fIndex) => (
+              <div className="checkbox_field">
+                <input type="checkbox" id={`first_all`} name="type"
+                  // checked={viewModel.selectedFirstIdArray.includes(first.id)}
+                  onChange={e => {
+                    if(e.target.checked){
+                      // viewModel.setSelectedFirstIdArray(viewModel.selectedFirstIdArray.concat(first.id))
+                    } else{
+                      // viewModel.setSelectedFirstIdArray(viewModel.selectedFirstIdArray.filter(id => id !== first.id))
+                    }
+                  }}
+                />
+                <label htmlFor={`first_all`}>
+                  <span className={`mark`} />
+                  <p>전체</p>
+                </label>
+              </div>
+              {viewModel.cateogryList.map((first, fIndex) => (
                 <div key={`first${fIndex}`} className="checkbox_field">
                   <input type="checkbox" id={`first${first.id}`} name="type"
-                    checked={selectedFirstIdArray.includes(first.id)}
+                    checked={viewModel.selectedFirstIdArray.includes(first.id)}
                     onChange={e => {
                       if(e.target.checked){
-                        setSelectedFirstIdArray(selectedFirstIdArray.concat(first.id))
+                        viewModel.setSelectedFirstIdArray(viewModel.selectedFirstIdArray.concat(first.id))
                       } else{
-                        setSelectedFirstIdArray(selectedFirstIdArray.filter(id => id !== first.id))
+                        viewModel.setSelectedFirstIdArray(viewModel.selectedFirstIdArray.filter(id => id !== first.id))
                       }
                     }}
                   />
@@ -226,30 +91,30 @@ export default function ListView() {
 
             <PopoverFilter
               filterName="1차"
-              isShowFilterPopover={showFilterPopover === 2}
+              isShowFilterPopover={viewModel.showFilterPopover === 2}
               onClickShowPopover={() => {
-                if(showFilterPopover !== 2) {
-                  setShowFilterPopover(2)
+                if(viewModel.showFilterPopover !== 2) {
+                  viewModel.setShowFilterPopover(2)
                 } else{
-                  setShowFilterPopover(0)
+                  viewModel.setShowFilterPopover(0)
                 }
               }}
-              onClickHidePopover={() => setShowFilterPopover(0)}
+              onClickHidePopover={() => viewModel.setShowFilterPopover(0)}
               classname="second"
             >
-              {cateogryList.filter(first => selectedFirstIdArray.includes(first.id)).map((first, fIndex) => (
+              {viewModel.cateogryList.filter(first => viewModel.selectedFirstIdArray.includes(first.id)).map((first, fIndex) => (
                 <div className={`first_group${first.name === '지출' ? ' expense' : first.name === '수입' ?  ' income' : ' saving'}`} key={`first${fIndex}`}>
                   <p className="first_name fs12">{first.name}</p>
                   <ul className="check_list flex ai-c flex-wrap">
                     {first.secondCategoryList.map((second, sIndex) => (
                       <li className="checkbox_field" key={`second${sIndex}`}>
                         <input type="checkbox" id={`${second.firstCategoryId}second${second.id}`} name="secondFilter"
-                        checked={selectedSecondIdArray.includes(second.id)}
+                        checked={viewModel.selectedSecondIdArray.includes(second.id)}
                         onChange={e => {
                           if(e.target.checked) {
-                            setSelectedSecondIdArray(selectedSecondIdArray.concat(second.id))
+                            viewModel.setSelectedSecondIdArray(viewModel.selectedSecondIdArray.concat(second.id))
                           } else{
-                            setSelectedSecondIdArray(selectedSecondIdArray.filter(id => id !== second.id))
+                            viewModel.setSelectedSecondIdArray(viewModel.selectedSecondIdArray.filter(id => id !== second.id))
                           }
                         }}
                       />
@@ -266,15 +131,15 @@ export default function ListView() {
 
             <PopoverFilter
               filterName="결제수단"
-              isShowFilterPopover={showFilterPopover === 3}
+              isShowFilterPopover={viewModel.showFilterPopover === 3}
               onClickShowPopover={() => {
-                if(showFilterPopover !== 3) {
-                  setShowFilterPopover(3)
+                if(viewModel.showFilterPopover !== 3) {
+                  viewModel.setShowFilterPopover(3)
                 } else{
-                  setShowFilterPopover(0)
+                  viewModel.setShowFilterPopover(0)
                 }
               }}
-              onClickHidePopover={() => setShowFilterPopover(0)}
+              onClickHidePopover={() => viewModel.setShowFilterPopover(0)}
               classname="payment_method"
             >
               {/* <div className="checkbox_field">
@@ -293,15 +158,15 @@ export default function ListView() {
                   <p>전체</p>
                 </label>
               </div> */}
-              {paymentMethodList.map((payment, pIndex) => (
+              {viewModel.paymentMethodList.map((payment, pIndex) => (
                 <div className="checkbox_field" key={`payment${pIndex}`}>
                   <input type="checkbox" id={`payment${payment.id}`} name="type"
-                    checked={selectedPaymentMethodIdArray.includes(payment.id)}
+                    checked={viewModel.selectedPaymentMethodIdArray.includes(payment.id)}
                     onChange={e => {
                       if(e.target.checked){
-                        setSelectedPaymentMethodIdArray(selectedPaymentMethodIdArray.concat(payment.id))
+                        viewModel.setSelectedPaymentMethodIdArray(viewModel.selectedPaymentMethodIdArray.concat(payment.id))
                       } else{
-                        setSelectedPaymentMethodIdArray(selectedPaymentMethodIdArray.filter(id => id !== payment.id))
+                        viewModel.setSelectedPaymentMethodIdArray(viewModel.selectedPaymentMethodIdArray.filter(id => id !== payment.id))
                       }
                     }}
                   />
@@ -317,7 +182,7 @@ export default function ListView() {
           <button
             type="button"
             className="contained main add_history"
-            onClick={() => setShowEditHistoryModal(true)}
+            onClick={() => viewModel.setShowEditHistoryModal(true)}
           >내역 추가</button>
         </div>
         
@@ -339,12 +204,12 @@ export default function ListView() {
             </thead>
 
             <tbody>
-              {filteredHistoryList.length === 0 && (
+              {viewModel.filteredHistoryList.length === 0 && (
                 <tr className="no-data">
                   <td colSpan={8}>작성된 내역이 없습니다.</td>
                 </tr>
               )}
-              {filteredHistoryList.filter(v => moment(v.date).format('YYYY-MM') === month).map((history, hIndex) => (
+              {viewModel.filteredHistoryList.filter(v => moment(v.date).format('YYYY-MM') === viewModel.month).map((history, hIndex) => (
                 <tr key={`history${hIndex}`}>
                   <td>{moment(history.date).format('YYYY.MM.DD')}</td>
                   <td>{history.description}</td>
@@ -367,20 +232,20 @@ export default function ListView() {
                       <button type="button"
                         className="btn_edit btn30"
                         onClick={() => {
-                          setShowEditHistoryModal(true)
-                          setSelectedHistory(history)
+                          viewModel.setShowEditHistoryModal(true)
+                          viewModel.setSelectedHistory(history)
                         }}
                       />
                       <button type="button"
                         className="btn_delete btn30"
-                        onClick={() => setModalAlertData({
+                        onClick={() => viewModel.setModalAlertData({
                           message: '삭제하시겠습니까?',
                           leftButtonText: '취소',
                           rightButtonText: '삭제',
-                          onClickLeftButton: () => setModalAlertData(undefined),
+                          onClickLeftButton: () => viewModel.setModalAlertData(undefined),
                           onClickRightButton: () => {
-                            deleteHistory(history.id)
-                            setModalAlertData(undefined)
+                            viewModel.deleteHistory(history.id)
+                            viewModel.setModalAlertData(undefined)
                           }
                         })}
                       />
@@ -394,38 +259,36 @@ export default function ListView() {
 
         <ReactPaginate
           breakLabel="..."
+          previousLabel="<"
           nextLabel=">"
           onPageChange={({selected}) => {
             viewModel.changePage(selected + 1)
-            
           }}
           pageRangeDisplayed={viewModel.pageSize}
-          pageCount={Math.ceil(viewModel.historyCount / viewModel.pageSize)}
-          // pageCount={historyCount / pageSize}
+          pageCount={Math.ceil(viewModel.historyCount/viewModel.pageSize)}
           forcePage={viewModel.page - 1}
-          previousLabel="<"
           renderOnZeroPageCount={null}
         />
       </Container>
 
-      {showEditHistoryModal && (
+      {viewModel.showEditHistoryModal && (
         <EditHistoryModal
-          cashbookHistory={selectedHistory}
-          categoryList={cateogryList}
-          paymentMethodList={paymentMethodList}
+          cashbookHistory={viewModel.selectedHistory}
+          categoryList={viewModel.cateogryList}
+          paymentMethodList={viewModel.paymentMethodList}
           onClickCancel={() => {
-            setShowEditHistoryModal(false)
-            setSelectedHistory(undefined)
+            viewModel.setShowEditHistoryModal(false)
+            viewModel.setSelectedHistory(undefined)
           }}
           onComplete={() => {
-            setShowEditHistoryModal(false)
-            setSelectedHistory(undefined)
+            viewModel.setShowEditHistoryModal(false)
+            viewModel.setSelectedHistory(undefined)
             viewModel.getHistory()
           }}
         />
       )}
 
-      {modalAlertData && <AlertModal {...modalAlertData} />}
+      {viewModel.modalAlertData && <AlertModal {...viewModel.modalAlertData} />}
     </>
   )
 }
@@ -554,17 +417,29 @@ const Container = styled.div`
     justify-content: center;
 
     li{
-      &.selected{
-        a{
-          background-color: pink;
-        }
-      }
+      padding: 0 4px;
       a{
         width: 30px;
         height: 30px;
         border-radius: 6px;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
+      }
+
+
+      &.selected{
+        a{
+          background-color: ${Colors.main};
+          color: white;
+        }
+      }
+      &:not(.selected):hover{
+        a{
+          background-color: ${Colors.light_main};
+          color: ${Colors.main};
+        }
       }
     }
   }
@@ -581,21 +456,6 @@ const Container = styled.div`
       margin-left: 8px;
       background: url(images/arrow_down.svg) no-repeat center center / 12px 12px;
       transform: rotate(-90deg);
-    }
-
-    &:not(.prev):not(.next){
-      margin: 0 4px;
-      background-color: transparent;
-
-      &.active{
-        background-color: ${Colors.main};
-        color: white;
-      }
-
-      &:not(.active):hover{
-        background-color: ${Colors.light_main};
-        color: ${Colors.main};
-      }
     }
   } */
 `

@@ -10,9 +10,11 @@ type PopoverMenuStyle = {
 }
 
 type PopoverMenuProps = {
+  isGroup?: boolean;
   isShowMoreMenu: boolean;
   onClickShowMenu: () => void;
   onClickHideMenu: () => void;
+  onClickInvite?: () => void;
   onClickEdit: () => void;
   onClickDelete: () => void;
   styles: PopoverMenuStyle;
@@ -40,6 +42,12 @@ export default function PopoverMenu(props: PopoverMenuProps) {
 
       {props.isShowMoreMenu && (
         <BasePopover>
+          {((props.isGroup !== undefined) && props.isGroup) && (
+            <button type="button"
+              className="btn invite"
+              onClick={props.onClickInvite}
+            >멤버 초대</button>
+          )}
           <button type="button"
             className="btn edit"
             onClick={props.onClickEdit}
@@ -74,6 +82,7 @@ const PopoverMenuDiv = styled.div<PopoverMenuStyle>`
     top: calc(${props => props.btnSize}px + 2px);
     right: 0;
     button{
+      width: 100%;
       padding: 10px 24px;
       background-color: transparent;
       transition: background-color .2s;

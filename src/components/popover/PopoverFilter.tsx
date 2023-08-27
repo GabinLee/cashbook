@@ -53,7 +53,7 @@ const PopoverFilterLi = styled.li`
   .filter_item_button{
     height: 36px;
     border-radius: 18px;
-    padding: 0 34px 0 12px;
+    padding: 0 34px 0 15px;
     background: white url(images/arrow_down.svg) no-repeat right 12px center / 10px 10px;
     box-shadow: rgba(34, 34, 34, 0.1) 2px 2px 6px 2px;
     &:hover{
@@ -62,13 +62,16 @@ const PopoverFilterLi = styled.li`
   }
 
   .popover{
-    min-width: 288px;
-    max-width: 360px;
     padding: 24px;
     top: 40px;
     left: 0;
 
+    &.first{
+      width: 360px;
+    }
+
     &.second{
+      width: 360px;
       .first_group{
         + .first_group{
           margin-top: 24px;
@@ -134,6 +137,7 @@ const PopoverFilterLi = styled.li`
     }
 
     &.payment_method{
+      width: 240px;
       .checkbox_field + .checkbox_field{
         margin-top: 4px;
       }

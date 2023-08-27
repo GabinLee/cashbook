@@ -32,27 +32,27 @@ export default function CashbookPage() {
           type="button"
           className={activeTab === 1 ? 'active' : ''}
           onClick={() => setSearchParams({tab: '1'})}
-        >Home</button>
+        >홈</button>
         <button
           type="button"
           className={activeTab === 2 ? 'active' : ''}
           onClick={() => setSearchParams({tab: '2'})}
-        >List</button>
+        >내역</button>
         <button
           type="button"
           className={activeTab === 3 ? 'active' : ''}
           onClick={() => setSearchParams({tab: '3'})}
-        >Calendar</button>
+        >월별</button>
         <button
           type="button"
           className={activeTab === 4 ? 'active' : ''}
           onClick={() => setSearchParams({tab: '4'})}
-        >Statistics</button>
+        >통계</button>
         <button
           type="button"
           className={activeTab === 5 ? 'active' : ''}
           onClick={() => setSearchParams({tab: '5'})}
-        >Settings</button>
+        >설정</button>
       </div>
 
       {activeTab === 1 && (

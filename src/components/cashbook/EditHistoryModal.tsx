@@ -232,7 +232,7 @@ export default function EditHistoryModal(props: EditHistory) {
                   }
                 }}
               >
-                <option value=""></option>
+                <option value="" hidden></option>
                 {cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.map((second, index) => (
                   <option key={`second${index}`} value={second.id}>{second.name}</option>
                 ))}
@@ -254,7 +254,7 @@ export default function EditHistoryModal(props: EditHistory) {
                   }}
                   disabled={thirdCategoryDisabled}
                 >
-                  <option value={''}></option>
+                  <option value={''} hidden></option>
                   {cateogryList.find(v => v.id === selectedFirstCateogry?.id)?.secondCategoryList.find(v => v.id === selectedSecondCategory?.id)?.thirdCategoryList.map
                   ((third, index) => (
                     <option key={`third${index}`} value={JSON.stringify(third)}>{third.name}</option>
