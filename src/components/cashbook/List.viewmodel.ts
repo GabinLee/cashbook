@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import CashbookHistory from "../../models/CashbookHistory.model";
@@ -6,6 +6,8 @@ import FirstCategory from "../../models/Category.model";
 import PaymentMethod from "../../models/PaymentMethod.model";
 import moment from "moment";
 import { ModalData } from "../../models/Modal.model";
+import { CashbookApi } from "../../api/Cashbook.api";
+import AppError from "../../models/AppError.model";
 
 
 export default function ListViewModel() {
@@ -113,27 +115,27 @@ export default function ListViewModel() {
     setSearchParams(searchParams)
   }
 
-  const getHistory = () => {
-    axios.get(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/detail`, {
-      params: {
-        page: page,
-        pageSize: pageSize
-      },
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success) {
-        console.log('내역 조회 성공', response.data.data)
+  const getHistory = async () => {
 
-        setHistoryList(response.data.data.results);
-        setFilteredHistoryList(response.data.data.results);
-        setHistoryCount(response.data.data.count);
-      } else{
-        alert('error')
+    if(id === undefined) return;
+
+    try {
+      const result = await CashbookApi.getHistoryList(parseInt(id), page, pageSize);
+
+      console.log('내역 조회 성공', result)
+
+      setHistoryList(result.results);
+      setFilteredHistoryList(result.results);
+      setHistoryCount(result.count);
+
+    } catch (error) {
+      if(error instanceof AppError) {
+        if(error.code === 1) {
+          alert('fasdjfjlsd')
+        }
       }
-    }).catch(error => console.log(error))
+      console.log(error)
+    }
   }
 
   const getCategory = () => {

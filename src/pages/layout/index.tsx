@@ -8,6 +8,7 @@ import { setToken, setUser } from "../../store/appSlice";
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
 import { DraggableNavItem } from "../../components/DraggableNavItem";
+import { UserApi } from "../../api/User.api";
 
 
 
@@ -32,19 +33,23 @@ export default function LayoutPage() {
 
 
   const getUser = () => {
-    axios.get(`${process.env.REACT_APP_HOST_URL}v1/user/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      console.log('layout - getUser')
-      if(response.data.success){
-        dispatch(setUser({nickname: response.data.data.nickname, name: response.data.data.name, email: response.data.data.email}));
-      } else{
-        alert('error')
-      }
+    UserApi.getMe()
+    .then(user => {
+      dispatch(setUser(user));
     }).catch(error => console.log(error))
+    // axios.get(`${process.env.REACT_APP_HOST_URL}v1/user/me`, {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`
+    //   }
+    // })
+    // .then(response => {
+    //   console.log('layout - getUser')
+    //   if(response.data.success){
+    //     dispatch(setUser({nickname: response.data.data.nickname, name: response.data.data.name, email: response.data.data.email}));
+    //   } else{
+    //     alert('error')
+    //   }
+    // }).catch(error => console.log(error))
   }
 
   const signout = () => {
