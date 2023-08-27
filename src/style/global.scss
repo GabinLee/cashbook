@@ -1,0 +1,422 @@
+@import url('https://webfontworld.github.io/tmoney/TmoneyRoundWind.css');
+
+
+:root{
+  --main: #438ef2;  // 67,142,242
+  --main_hover: #1371ef;
+  // --main_hover: #2b80f0;
+  --light_main: #dfecff; // rgb(223,236,255)
+  --light_main_hover: #D3E4FC;
+
+
+  --light_red: #FFD6D6;
+  --red: #E40000;
+  --light_peach: #FFDFC0;
+  --peach: #EC6600;
+  --light_yellow: #FFF1B1;
+  --yellow: #F69200;  // rgb(246,146,0)
+  --light_green: #DBF0E0;
+  --green: #388A49;  // rgb(56,138,73)
+  --light_blue: #DEE4F1;
+  --blue: #0000e4;
+  --extra_light_purple : #F8F9FF;
+  --light_purple: #e3defe;
+  --purple: #7164b4;
+  --pink: #ED706B;
+
+  // // --light_purple: #EAECFF;
+  // // --purple: #B5A5FF;
+
+  
+  --gray_5: #555;
+  --gray_be: #bebebe;
+  --gray_c: #ccc;
+  --gray_e5: #e5e5e5;
+  --gray_e: #eee;
+  --gray_f5: #f5f5f5;
+}
+
+.color_main{ color: var(--main); }
+.color_red{ color: var(--red); }
+.color_yellow{ color: var(--yellow); }
+.color_green{ color: var(--green); }
+.fs12{ font-size: 12px; }
+
+.flex1{ flex: 1; }
+.flex{
+  display: flex;
+  &.column{
+    flex-direction: column;
+  }
+}
+.ai-c{ align-items: center; }
+.ai-s{ align-items: flex-start; }
+.ai-e{ align-items: flex-end; }
+.jc-c{ justify-content: center; }
+.jc-sb{ justify-content: space-between; }
+.flex-c{ display: flex; align-items: center; justify-content: center; }
+.flex-wrap{ flex-wrap: wrap; }
+
+.shadow{
+  box-shadow: rgba(34, 34, 34, 0.1) 2px 2px 6px 2px;
+}
+
+.card{
+  background-color: white;
+  box-shadow: rgba(34, 34, 34, 0.1) 2px 2px 6px 2px;
+  // box-shadow: 3px 6px 12px 2px rgba(34, 34, 34, .2);
+}
+
+.contained{
+  border-radius: 6px;
+
+  &:disabled{
+    position: relative;
+    &::before{
+      content: '';
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background-color: rgba(0, 0, 0, 0.25);
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+
+  &.main{
+    color: white;
+    transition: background-color .2s;
+    background-color: var(--main);
+    &:not(:disabled):hover{
+      background-color: var(--main_hover);
+    }
+  }
+
+  &.light_main{
+    color: var(--main);
+    background-color: var(--light_main);
+    &:not(:disabled):hover{
+      background-color: var(--light_main_hover);
+    }
+  }
+
+  &.gray{
+    transition: background-color .2s;
+    &:not(:hover){
+      background-color: var(--gray_e5);
+    }
+    &:hover{
+      background-color: var(--gray_c);
+    }
+  }
+}
+
+.outlined{
+  border-radius: 6px;
+  &:not(:hover){
+    border: 1px solid var(--gray_be);
+  }
+  &:hover{
+    border: 1px solid var(--main);
+  }
+}
+
+.input_field, .select_field{
+  &:not(.standard){
+    p:nth-child(1){
+      font-size: 12px;
+      color: var(--gray_5);
+    }
+
+    &.flex{
+      p:nth-child(1){
+        padding-right: 24px;
+        white-space: nowrap;
+      }
+    }
+
+    &:not(.flex){
+      p:nth-child(1){
+        padding: 0 2px 4px;
+      }
+    }
+  }
+}
+
+.input_field{
+  input{
+    width: 100%;
+    height: 40px;
+  }
+
+  &:not(.standard){
+    input{
+      border: 1px solid var(--gray_be);
+      border-radius: 6px;
+    }
+  }
+
+  &.standard{
+    position: relative;
+    input{
+      padding: 0;
+      border: none;
+      background-color: transparent;
+      outline: none;
+      &:focus, &.exist{
+        + p{
+          font-size: 10px;
+          top: 0;
+          transform: translateY(calc(-100% + 3px));
+        }
+      }
+    }
+
+    p{
+      text-transform: uppercase;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translate(0, -50%);
+      transition: all .25s;
+    }
+  }
+
+  &.message{
+    padding-bottom: 20px;
+    position: relative;
+    .msg{
+      padding-top: 4px;
+      font-size: 12px;
+      position: absolute;
+      bottom: 0;
+      &.error{
+        color: var(--red);
+      }
+    }
+  }
+}
+
+.select_field{
+  display: flex;
+  .select_box{
+    background: white url(../../public/images/arrow_down.svg) no-repeat right 10px center / 12px 12px;
+    select{
+      height: 40px;
+      padding: 0 32px 0 10px;
+      border: 1px solid var(--gray_be);
+      border-radius: 6px;
+      background-color: transparent;
+      &:disabled{
+        background-color: var(--gray_e5);
+      }
+    }
+  }
+}
+
+input[type="radio"]{
+  display: none;
+
+  & + label{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    .checkmark{
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      border: 1px solid var(--gray_be);
+      border-radius: 50%;
+      display: inline-block;
+    }
+  }
+
+  &:checked + label{
+    .checkmark{
+      position: relative;
+      &::before{
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      &:not(.fisrt1):not(.fisrt2):not(.fisrt3){
+        border-color: var(--main);
+        &::before{
+          background-color: var(--main);
+        }
+      }
+    }
+  }
+}
+
+input[type="checkbox"] {
+  display: none;
+  + label {
+    padding: 6px 6px 6px 0;
+    display: flex;
+    position: relative;
+
+    &:hover{
+      &::before{
+        content: '';
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: rgb(211, 228, 252, .5);
+        position: absolute;
+        top: 0;
+        left: -6px;
+        transform: translate(0, 0);
+      }
+    }
+    .mark {
+      width: 18px;
+      min-width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      border: 1px solid var(--gray_be);
+      border-radius: 4px;
+      background: white url(../../public/images/check.svg) no-repeat center center / 12px 12px;
+      display: inline-block;
+      position: relative;
+      transition-duration: .25s;
+      transition-property: background-color border-color;
+      + p{
+        transition: color .25s;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  &:checked + label {
+    .mark{
+      border-color: var(--main);
+      background-color: var(--main);
+    }
+  }
+}
+
+
+
+
+.tabs{
+  display: flex;
+  position: relative;
+  &::before{
+    content: '';
+    width: calc(100% - 48px);
+    height: 2px;
+    border-radius: 2px;
+    background-color: var(--gray_be);
+    position: absolute;
+    bottom: 0;
+    left: 24px;
+    z-index: 0;
+  }
+
+
+  button{
+    height: 36px;
+    padding: 0 12px;
+    border-bottom: 2px solid transparent;
+    background-color: transparent;
+    z-index: 1;
+    + button{
+      margin-left: 6px;
+    }
+
+    &.active{
+      color: var(--main);
+      border-color: var(--main);
+    }
+  }
+
+  + .contents{
+    overflow: auto;
+  }
+}
+
+
+.area.table{
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: rgba(34, 34, 34, 0.1) 2px 2px 6px 2px;
+  overflow: auto;
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    th{
+      font-size: 12px;
+      font-weight: normal;
+      background-color: white;
+      position: sticky;
+      top: 0;
+      &::after{
+        content: '';
+        width: 100%;
+        height: 1px;
+        background-color: var(--gray_c);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+    }
+  }
+}
+
+
+.btn{
+  &20{
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+
+  &30{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+
+  &_edit{
+    background: var(--gray_f5) url(../../public/images/edit.svg) no-repeat center center;
+    &.btn30{
+      background-size: 14px 14px;
+    }
+    &:hover{
+      background-color: var(--gray_e);
+    }
+  }
+
+  &_delete{
+    background: var(--gray_f5) url(../../public/images/delete.svg) no-repeat center center;
+    &.btn30{
+      background-size: 14px 14px;
+    }
+    &:hover{
+      background-color: var(--gray_e);
+    }
+  }
+
+  &_clear{
+    &:not(.dark){
+      background: rgba(255, 255, 255, 0.5) url(../../public/images/clear.svg) no-repeat center center / 10px 10px;
+      &:hover{
+        background-color: var(--gray_e);
+      }
+    }
+
+    &.dark{
+      background: #222 url(../../public/images/clear_white.svg) no-repeat center center / 8px 8px;
+      &:hover{
+        background-color: var(--gray_5);
+      }
+    }
+  }
+}
