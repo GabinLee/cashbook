@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Colors } from "../../style/Styles";
+import { Colors, Flex } from "../../style/Styles";
 
 
 export const Container = styled.main`
@@ -7,9 +7,7 @@ export const Container = styled.main`
   padding: 60px;
   background-color: rgba(0, 0, 0, 0.5);
   inset: 0px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  ${Flex('', 'center', 'center')}
   position: fixed;
   z-index: 101;
 

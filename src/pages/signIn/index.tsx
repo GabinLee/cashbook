@@ -3,10 +3,8 @@ import { Container } from "./styles";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import SignUpModal from "../../components/SignUpModal";
-import { useAppDispatch, useAppSelector } from "../../store";
-import { setToken, setUser } from "../../store/appSlice";
-// import User from "../../models/UserModel";
-// import { useSelector } from "react-redux";
+import { useAppDispatch } from "../../store";
+import { setToken } from "../../store/appSlice";
 
 
 export default function SignInPage() {
@@ -127,7 +125,7 @@ export default function SignInPage() {
             className="kakao"
             onClick={onClickLoginKakao}
           >
-            <img src="images/login_kakao.png" alt="카카오 로그인" />
+            <img src="/images/login_kakao.png" alt="카카오 로그인" />
           </button>
         </div>
       </Container>

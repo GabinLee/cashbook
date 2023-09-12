@@ -305,43 +305,6 @@ input[type="checkbox"] {
 
 
 
-.tabs{
-  display: flex;
-  position: relative;
-  &::before{
-    content: '';
-    width: calc(100% - 48px);
-    height: 2px;
-    border-radius: 2px;
-    background-color: var(--gray_be);
-    position: absolute;
-    bottom: 0;
-    left: 24px;
-    z-index: 0;
-  }
-
-
-  button{
-    height: 36px;
-    padding: 0 12px;
-    border-bottom: 2px solid transparent;
-    background-color: transparent;
-    z-index: 1;
-    + button{
-      margin-left: 6px;
-    }
-
-    &.active{
-      color: var(--main);
-      border-color: var(--main);
-    }
-  }
-
-  + .contents{
-    overflow: auto;
-  }
-}
-
 
 .area.table{
   border-radius: 12px;

@@ -32,3 +32,46 @@ export const Font = {
   // size_12: '12px',
   // size_16: '16px'
 }
+
+
+export const Flex = (direction='row', align='stretch', justify='flex-start') => `
+  display: flex;
+  flex-direction: ${direction};
+  align-items: ${align};
+  justify-content: ${justify};
+`;
+
+
+// export const Mixins = {
+//   flexBox: (direction = 'row', align = 'stretch', justify = 'flex-start') => `
+//     display: flex;
+//     flex-direction: ${direction};
+//     align-items: ${align};
+//     justify-content: ${justify};
+//   `
+// }
+
+
+
+// [
+//   '#fe7877bf',
+//   '#fd925ebf',
+//   '#f7d021bf',
+//   '#88e18ebf',
+//   '#2dcc70bf',
+//   '#99e1ffbf',
+//   '#5fa9ffbf',
+//   '#c29effbf',
+//   '#fb6a87bf'
+//   // '#fcb100',
+//   // '#9ff23a',
+//   // '#6ad922',
+//   // '#2acec6',
+//   // '#04e6f7',
+//   // '#70ffd9',
+//   // '#55cdff',
+//   // '#fb88ff',
+//   // '#fc889f',
+//   // '#fb6a87',
+//   // '#b79470',
+// ]

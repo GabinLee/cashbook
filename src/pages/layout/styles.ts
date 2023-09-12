@@ -1,22 +1,23 @@
 import styled from "styled-components";
-import { Colors } from "../../style/Styles";
+import { Colors, Flex } from "../../style/Styles";
 
 
 export const Container = styled.div`
   min-width: 1440px;
   height: 100vh;
-  display: flex;
-
+  ${Flex('', '', '')}
+  overflow: auto;
+  
   .header_nav{
-    display: flex;
-    flex-direction: column;
+    ${Flex('column', '', '')}
+    border-right: 1px solid ${Colors.gray_e};
     background-color: white;
 
     header{
       width: 240px;
       height: 60px;
       background-color: ${Colors.main};
-      display: flex;
+      ${Flex('', '', '')}
       button{
         width: 100%;
         background-color: inherit;
@@ -35,6 +36,7 @@ export const Container = styled.div`
       ul{
         width: 100%;
         min-height: 100%;
+        padding: 0 0 12px;
         overflow: hidden;
       }
     }
@@ -51,7 +53,7 @@ export const Container = styled.div`
   }
 
   main{
-    width: calc(100% - 240px);
+    width: calc(100% - 241px);
     /* min-width: 1440px; */
   }
 `

@@ -6,7 +6,7 @@ import Cashbook from "../models/Cashbook.model";
 import type { CSSProperties } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Colors } from "../style/Styles";
+import { Colors, Flex } from "../style/Styles";
 
 
 type DraggableNavItemProps = {
@@ -52,17 +52,18 @@ export function DraggableNavItem(props: DraggableNavItemProps) {
       onMouseOver={props.onMouseOver}
       onMouseLeave={props.onMouseLeave}
     >
-      <img src={`images/nav_ic/cashbook${(props.cashbook.isActive || (location.pathname === `/${props.cashbook.id}`)) ? '_main' : ''}.svg`} alt={props.cashbook.name} className="ic cash" />
+      <img src={`/images/nav_ic/cashbook${(props.cashbook.isActive || (location.pathname === `/${props.cashbook.id}`)) ? '_main' : ''}.svg`} alt={props.cashbook.name} className="ic cash" />
       
       <div className="flex1 flex ai-c">
         <span className="name">{props.cashbook.name}</span>
+        {/* {props.cashbook.id} */}
         {props.cashbook.isGroup && (
-          <img src={`images/people${(props.cashbook.isActive || (location.pathname === `/${props.cashbook.id}`)) ? '_main' : ''}.svg`} alt={props.cashbook.name} className="ic people" />
+          <img src={`/images/people${(props.cashbook.isActive || (location.pathname === `/${props.cashbook.id}`)) ? '_main' : ''}.svg`} alt={props.cashbook.name} className="ic people" />
         )}
       </div>
 
       <button className="btn drag" style={dragBtnStyle} {...listeners}>
-        <img src={`images/drag.svg`} alt="drag" className="ic drag" />
+        <img src={`/images/drag.svg`} alt="drag" className="ic drag" />
       </button>
     </DraggableNavItemBx>
   );
@@ -77,8 +78,7 @@ const DraggableNavItemBx = styled.li`
   border-radius: 6px;
   background-color: transparent;
   cursor: pointer;
-  display: flex;
-  align-items: center;
+  ${Flex('', 'center', '')}
   transition: background-color .2s;
   &:hover, &.active{
     background-color: ${Colors.light_main};
@@ -114,9 +114,7 @@ const DraggableNavItemBx = styled.li`
   .btn.drag{
     width: 36px;
     height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    ${Flex('', 'center', 'center')}
     background-color: transparent;
   }
 `

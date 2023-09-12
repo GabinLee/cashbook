@@ -1,4 +1,4 @@
-import { AnyAction, CombinedState, combineReducers, PayloadAction } from "@reduxjs/toolkit";
+import { AnyAction, CombinedState, combineReducers } from "@reduxjs/toolkit";
 import app, { InitState } from "./appSlice";
 
 export interface RootStates {

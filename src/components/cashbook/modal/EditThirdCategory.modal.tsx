@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
-import FirstCategory, { SecondCategory, ThirdCategory } from "../../models/Category.model";
+import FirstCategory, { SecondCategory, ThirdCategory } from "../../../models/Category.model";
 import axios from "axios";
-import BaseModal from "../BaseModal.modal";
+import BaseModal from "../../BaseModal.modal";
 
 type EditThirdCategory = {
   firstCategory? : FirstCategory

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useOutsideTouch } from "../utils/Hooks";
+import { Flex } from "../style/Styles";
 // import { ModalData } from "../models/AlertModal";
 
 type BaseModalProps = {
@@ -31,9 +32,7 @@ const BaseModalDiv = styled.div`
   padding: 60px;
   background-color: rgba(0, 0, 0, 0.5);
   inset: 0px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  ${Flex('', 'center', 'center')}
   position: fixed;
   z-index: 101;
 
@@ -58,8 +57,7 @@ const BaseModalDiv = styled.div`
 
     &_bottom{
       padding: 12px 24px 24px;
-      display: flex;
-      align-items: center;
+      ${Flex('', 'center', '')}
       position: sticky;
       bottom: 0;
       button{

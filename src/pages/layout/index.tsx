@@ -5,7 +5,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Cashbook from "../../models/Cashbook.model";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setToken, setUser } from "../../store/appSlice";
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragStartEvent, PointerSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
 import { DraggableNavItem } from "../../components/DraggableNavItem";
 import { UserApi } from "../../api/User.api";
@@ -37,19 +37,6 @@ export default function LayoutPage() {
     .then(user => {
       dispatch(setUser(user));
     }).catch(error => console.log(error))
-    // axios.get(`${process.env.REACT_APP_HOST_URL}v1/user/me`, {
-    //   headers: {
-    //     Authorization: `Bearer ${token}`
-    //   }
-    // })
-    // .then(response => {
-    //   console.log('layout - getUser')
-    //   if(response.data.success){
-    //     dispatch(setUser({nickname: response.data.data.nickname, name: response.data.data.name, email: response.data.data.email}));
-    //   } else{
-    //     alert('error')
-    //   }
-    // }).catch(error => console.log(error))
   }
 
   const signout = () => {
@@ -110,7 +97,7 @@ export default function LayoutPage() {
           <button type="button"
             onClick={e => navigate('/')}
           >
-            <img src="images/logo_white.svg" alt="로고 이미지" />
+            <img src="/images/logo_white.svg" alt="로고 이미지" />
           </button>
         </header>
 

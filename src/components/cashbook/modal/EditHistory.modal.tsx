@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
-import CashbookHistory from "../../models/CashbookHistory.model"
+import CashbookHistory from "../../../models/CashbookHistory.model"
 import moment from "moment"
 import axios from "axios"
 import { useParams } from "react-router-dom"
-import FirstCategory, { SecondCategory, ThirdCategory } from "../../models/Category.model"
-import PaymentMethod from "../../models/PaymentMethod.model"
-import { Colors } from "../../style/Styles"
-import { addComma } from "../../utils/Utils"
-import BaseModal from "../BaseModal.modal"
+import FirstCategory, { SecondCategory, ThirdCategory } from "../../../models/Category.model"
+import PaymentMethod from "../../../models/PaymentMethod.model"
+import { Colors } from "../../../style/Styles"
+import { addComma } from "../../../utils/Utils"
+import BaseModal from "../../BaseModal.modal"
 
 type EditHistory = {
   cashbookHistory?: CashbookHistory
@@ -39,7 +39,7 @@ export default function EditHistoryModal(props: EditHistory) {
 
   const [deleteImageIdArray, setDeleteImageIdArray] = useState<number[]>([]);
   
-  const isValidConfirm = !(description && price && selectedFirstCateogry);
+  const isValidConfirm = !(description && price && selectedFirstCateogry && selectedSecondCategory && selectedPaymentMethod);
 
 
   useEffect(() => {
@@ -433,15 +433,15 @@ const Container = styled.div`
           height: 40px;
           border: 1px solid ${Colors.gray_be};
           border-radius: 50%;
-          background: url(images/add_photo.svg) no-repeat center center;
+          background: url(/images/add_photo.svg) no-repeat center center;
           &:hover{
-            background: ${Colors.gray_e5} url(images/add_photo.svg) no-repeat center center;
+            background: ${Colors.gray_e5} url(/images/add_photo.svg) no-repeat center center;
           }
         }
         + .img_list{
           width: 348px;
-          height: 102px;
-          margin-left: -24px;
+          height: 117px;
+          margin: 0 -24px;
           padding: 12px 12px 0 84px;
           overflow: auto;
           li{

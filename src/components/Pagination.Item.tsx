@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Colors } from "../style/Styles";
+import { Colors, Flex } from "../style/Styles";
 // import { ModalData } from "../models/AlertModal";
 // import BaseModal from "./BaseModal.modal";
 
@@ -35,9 +35,7 @@ export default function PaginationItem(props: PaginationItemProps) {
 
 const PaginationDiv  = styled.div`
   padding: 10px 12px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  ${Flex('', 'center', 'center')}
 
   button{
     width: 30px;
@@ -46,13 +44,13 @@ const PaginationDiv  = styled.div`
 
     &.prev{
       margin-right: 8px;
-      background: url(images/arrow_down.svg) no-repeat center center / 12px 12px;
+      background: url(/images/arrow_down.svg) no-repeat center center / 12px 12px;
       transform: rotate(90deg);
     }
 
     &.next{
       margin-left: 8px;
-      background: url(images/arrow_down.svg) no-repeat center center / 12px 12px;
+      background: url(/images/arrow_down.svg) no-repeat center center / 12px 12px;
       transform: rotate(-90deg);
     }
 

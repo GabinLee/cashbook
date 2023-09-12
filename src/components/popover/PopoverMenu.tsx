@@ -70,7 +70,7 @@ const PopoverMenuDiv = styled.div<PopoverMenuStyle>`
     width: ${props => props.btnSize}px;
     height: ${props => props.btnSize}px;
     border-radius: 50%;
-    background: url(images/more.svg) no-repeat center center / 12px 12px;
+    background: url(/images/more.svg) no-repeat center center / 12px 12px;
     transition: background-color .2s;
 
     &:hover, &.active{

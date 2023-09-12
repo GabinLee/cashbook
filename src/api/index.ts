@@ -22,8 +22,6 @@ instance.interceptors.request.use(async (request) => {
 })
 instance.interceptors.response.use(response => {
 
-	console.log('interceptors.response')
-
 	const data = response.data as ResponseData
 
 	// if(data.message_code === 20002) {

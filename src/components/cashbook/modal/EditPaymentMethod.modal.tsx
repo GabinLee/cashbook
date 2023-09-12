@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
-import PaymentMethod from "../../models/PaymentMethod.model"
+import PaymentMethod from "../../../models/PaymentMethod.model"
 import axios from "axios"
 import { useParams } from "react-router-dom"
-import BaseModal from "../BaseModal.modal"
+import BaseModal from "../../BaseModal.modal"
 // import CashbookHistory from "../../models/CashbookHistory.model"
 // import moment from "moment"
 

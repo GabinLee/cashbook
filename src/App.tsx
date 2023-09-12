@@ -9,7 +9,9 @@ import SignInPage from "./pages/signIn";
 import LayoutPage from "./pages/layout";
 import MainPage from "./pages/main";
 import CashBookPage from "./pages/cashbook";
-import SettingsPage from "./pages/settings";
+// import SettingsPage from "./pages/settings";
+import HistoryPage from "./pages/cashbook/History";
+import SettingsPage from "./pages/cashbook/Settings";
 
 
 function App() {
@@ -59,24 +61,6 @@ function App() {
       }
     }
   }, [user])
-  
-  // useEffect(() => {
-  //   console.log('app - token', token);
-  //   console.log('app - user', user);
-
-  //   if(token === undefined) return;
-
-  //   if(token === null) {
-  //     navigate('/sign-in')
-  //   } else {
-  //     if(location.pathname === '/' || location.pathname === '/sign-in') {
-  //       navigate('/')
-  //     }
-  //     else {
-  //       navigate(`${location.pathname}${location.search}`)
-  //     }
-  //   }
-  // }, [token])
 
   const getUser = () => {
     axios.get(`${process.env.REACT_APP_HOST_URL}v1/user/me`, {
@@ -106,8 +90,10 @@ function App() {
 
       <Route path="/" element={<LayoutPage />}>
         <Route path="" element={<MainPage />} />
-        <Route path="/:id" element={<CashBookPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/:id" element={<CashBookPage />}>
+          <Route path="" element={<HistoryPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
       </Route>
     </Routes>
   );
