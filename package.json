@@ -2,6 +2,8 @@
   "name": "cashbook",
   "version": "0.1.0",
   "private": true,
+  "main": "./public/electron.js",
+  "homepage": "./",
   "dependencies": {
     "@dnd-kit/core": "^6.0.8",
     "@dnd-kit/sortable": "^7.0.2",
@@ -18,6 +20,7 @@
     "@types/react-redux": "^7.1.25",
     "axios": "^1.4.0",
     "chart.js": "^4.3.0",
+    "electron-is-dev": "^2.0.0",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
@@ -37,7 +40,14 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron": "tsc ./public/electron.ts && concurrently -n renderer,main \"cross-env BROWSER=none yarn start\" \"wait-on http://127.0.0.1:3000 && electron .\"",
+    "pack": "yarn compile-main && yarn react-build && electron-builder --dir",
+    "ebuild": "yarn compile-main && yarn react-build && electron-builder build",
+    "build:osx": "yarn build -- --mac",
+    "build:linux": "yarn build -- --linux",
+    "build:win": "yarn build -- --win",
+    "predist": "yarn compile-main"
   },
   "eslintConfig": {
     "extends": [
@@ -60,6 +70,11 @@
   "proxy": "http://cashbook-api-stage.jollybeen.com",
   "devDependencies": {
     "@types/redux-logger": "^3.0.9",
-    "@types/styled-components": "^5.1.26"
+    "@types/styled-components": "^5.1.26",
+    "concurrently": "^8.2.1",
+    "cross-env": "^7.0.3",
+    "electron": "^26.2.0",
+    "electron-builder": "^24.6.4",
+    "wait-on": "^7.0.1"
   }
 }
