@@ -1,9 +1,9 @@
 import { HistoryContainer } from "./styles";
 import HistoryViewModel from "./History.viewmodel";
 import HistoryTop from "../../components/cashbook/HistoryTop.item";
-import ListView from "../../components/cashbook/view/ListView";
-import CalendarView from "../../components/cashbook/view/CalendarView";
-import StatisticsView from "../../components/cashbook/view/StatisticsView";
+import ListView from "../../components/cashbook/historyView/ListView";
+import CalendarView from "../../components/cashbook/historyView/CalendarView";
+import StatisticsView from "../../components/cashbook/historyView/StatisticsView";
 
 
 export default function HistoryPage() {

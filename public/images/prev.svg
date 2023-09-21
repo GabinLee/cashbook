@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <g id="ic_arrow" transform="translate(-1750 -1)">
+    <rect id="frame20" width="20" height="20" transform="translate(1750 1)" fill="none"/>
+    <g id="arrow" transform="translate(1760.071 -5.899) rotate(45)">
+      <line id="line2" x1="10" y2="10" transform="translate(7 7)" fill="none" stroke="#555" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      <path id="line1" d="M17,17H7V7" transform="translate(0)" fill="none" stroke="#555" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

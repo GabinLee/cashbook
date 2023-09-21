@@ -22,6 +22,7 @@ export default function LayoutPage() {
   const user = useAppSelector(state => state.app.user);
 
   const [cashbookList, setCashbookList] = useState<Cashbook[]>([]);
+  const [showAlarmCard, setShowAlarmCard] = useState(false)
 
   // for drag overlay
   const [isDraggingNav, setIsDraggingNav] = useState<Cashbook>()
@@ -166,9 +167,23 @@ export default function LayoutPage() {
         
         <div className="area profile flex ai-c">
           <p className="flex1">{user?.nickname}</p>
-          <button className="fs12"
+          <div className="alarm_bx">
+            <button className="btn alarm"
+              onClick={() => {}}
+            >
+              <img src="/images/alarm.svg" alt="알림" />
+            </button>
+            {showAlarmCard && (
+              <div className="card alarm">
+                asdfadfasdfdas
+              </div>
+            )}
+          </div>
+          <button className="btn logout"
             onClick={() => signout()}
-          >로그아웃</button>
+          >
+            <img src="/images/logout.svg" alt="로그아웃" />
+          </button>
         </div>
       </div>
 

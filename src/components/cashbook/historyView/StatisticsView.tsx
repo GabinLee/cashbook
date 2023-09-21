@@ -1,7 +1,7 @@
 import { Pie } from "react-chartjs-2"
 import { addComma } from "../../../utils/Utils"
 import StatisticsViewModel from "./Statistics.viewmodel"
-import { StatisticsViewContainesr } from "./styles"
+import { StatisticsViewContainer } from "./styles"
 
 
 export type StatisticsViewProps = {
@@ -14,7 +14,7 @@ export default function StatisticsView(props: StatisticsViewProps) {
   const viewModel = StatisticsViewModel(props);
 
   return (
-    <StatisticsViewContainesr>
+    <StatisticsViewContainer className="main_cont">
       <div className="card">
         {viewModel.expenseHistory.length === 0 && (
           <p className="data-none">지출 내역이 없습니다.</p>
@@ -92,6 +92,6 @@ export default function StatisticsView(props: StatisticsViewProps) {
           </>
           )}
       </div>
-    </StatisticsViewContainesr>
+    </StatisticsViewContainer>
   )
 }

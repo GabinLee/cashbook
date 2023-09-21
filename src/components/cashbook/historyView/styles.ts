@@ -3,8 +3,6 @@ import { Colors, Flex } from "../../../style/Styles";
 
 
 export const ListViewContainer = styled.div`
-  height: calc(100% - (69px + 60px));
-  padding: 0 0 24px;
   ${Flex('column')}
   
   .area{
@@ -119,9 +117,10 @@ export const ListViewContainer = styled.div`
 `
 
 export const CalendarViewContainer = styled.div`
-  height: calc(100% - (69px + 60px + 24px));
-  border-radius: 24px;
-  overflow: hidden;
+  .card{
+    height: 100%;
+    border-radius: 24px;
+  }
 
   .area{
     &_head{
@@ -232,15 +231,14 @@ export const CalendarViewContainer = styled.div`
   }
 `
 
-export const StatisticsViewContainesr = styled.div`
-  max-height: calc(100% - (69px + 60px));
-  padding: 0 0 24px;
+export const StatisticsViewContainer = styled.div`
   ${Flex()}
 
   .card{
     flex: 1;
     padding: 24px 12px;
     border-radius: 24px;
+    overflow: auto;
     + .card{
       margin-left: 24px;
     }

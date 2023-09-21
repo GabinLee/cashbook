@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <g id="ic_sign_out" data-name="ic_sign out" transform="translate(-1810)">
+    <rect id="frame20" width="20" height="20" transform="translate(1810)" fill="none"/>
+    <g id="log-out" transform="translate(1811 1)">
+      <path id="패스_83194" data-name="패스 83194" d="M9,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H9" transform="translate(-3 -3)" fill="none" stroke="#555" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      <path id="패스_83195" data-name="패스 83195" d="M16,17l5-5L16,7" transform="translate(-3 -3)" fill="none" stroke="#555" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      <line id="선_275" data-name="선 275" x1="12" transform="translate(6 9)" fill="none" stroke="#555" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

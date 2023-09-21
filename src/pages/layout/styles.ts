@@ -45,10 +45,38 @@ export const Container = styled.div`
     .area.profile{
       background-color: ${Colors.gray_e5};
       height: 60px;
-      padding: 18px 24px;
-      button{
+      padding: 0 14px 0 24px;
+
+      .btn{
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        ${Flex('', 'center', 'center')}
         background-color: transparent;
+        transition: background-color .25s;
+        img{
+          width: 18px;
+          height: 18px;
+        }
+
+        &:hover{
+          background-color: white;
+        }
       }
+
+      .alarm_bx{
+        position: relative;
+        .btn.alarm{}
+
+        .card.alarm{
+          position: absolute;
+          top: 0;
+          left: 0;
+          transform: translateY(-100%);
+        }
+      }
+
+      .btn.logout{}
     }
   }
 
