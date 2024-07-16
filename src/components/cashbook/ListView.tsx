@@ -72,14 +72,14 @@ export default function ListView() {
               {viewModel.cateogryList.map((first, fIndex) => (
                 <div key={`first${fIndex}`} className="checkbox_field">
                   <input type="checkbox" id={`first${first.id}`} name="type"
-                    checked={viewModel.selectedFirstIdArray.includes(first.id)}
-                    onChange={e => {
-                      if(e.target.checked){
-                        viewModel.setSelectedFirstIdArray(viewModel.selectedFirstIdArray.concat(first.id))
-                      } else{
-                        viewModel.setSelectedFirstIdArray(viewModel.selectedFirstIdArray.filter(id => id !== first.id))
-                      }
-                    }}
+                    // checked={viewModel.selectedFirstIdArray.includes(first.id)}
+                    // onChange={e => {
+                    //   if(e.target.checked){
+                    //     viewModel.setSelectedFirstIdArray(viewModel.selectedFirstIdArray.concat(first.id))
+                    //   } else{
+                    //     viewModel.setSelectedFirstIdArray(viewModel.selectedFirstIdArray.filter(id => id !== first.id))
+                    //   }
+                    // }}
                   />
                   <label htmlFor={`first${first.id}`}>
                     <span className={`mark first${first.id}`} />
@@ -89,7 +89,7 @@ export default function ListView() {
               ))}
             </PopoverFilter>
 
-            <PopoverFilter
+            {/* <PopoverFilter
               filterName="1차"
               isShowFilterPopover={viewModel.showFilterPopover === 2}
               onClickShowPopover={() => {
@@ -127,9 +127,9 @@ export default function ListView() {
                   </ul>
                 </div>
               ))}
-            </PopoverFilter>
+            </PopoverFilter> */}
 
-            <PopoverFilter
+            {/* <PopoverFilter
               filterName="결제수단"
               isShowFilterPopover={viewModel.showFilterPopover === 3}
               onClickShowPopover={() => {
@@ -142,7 +142,7 @@ export default function ListView() {
               onClickHidePopover={() => viewModel.setShowFilterPopover(0)}
               classname="payment_method"
             >
-              {/* <div className="checkbox_field">
+              <div className="checkbox_field">
                 <input type="checkbox" id="payment_all" name="type"
                   checked={selectedPaymentMethodIdArray === paymentMethodList.map(v => v.id)}
                   onChange={e => {
@@ -157,7 +157,7 @@ export default function ListView() {
                   <span className="mark" />
                   <p>전체</p>
                 </label>
-              </div> */}
+              </div>
               {viewModel.paymentMethodList.map((payment, pIndex) => (
                 <div className="checkbox_field" key={`payment${pIndex}`}>
                   <input type="checkbox" id={`payment${payment.id}`} name="type"
@@ -176,7 +176,7 @@ export default function ListView() {
                   </label>
                 </div>
               ))}
-            </PopoverFilter>
+            </PopoverFilter> */}
           </ul>
 
           <button

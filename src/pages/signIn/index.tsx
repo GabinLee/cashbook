@@ -31,7 +31,7 @@ export default function SignInPage() {
   }, [searchParams])
 
   const signIn = () => {
-    console.log('signin');
+    console.log('sign in / 로그인');
     axios.post(`${process.env.REACT_APP_HOST_URL}v1/auth/token`, {
       type: 'uid',
       uid: userId,

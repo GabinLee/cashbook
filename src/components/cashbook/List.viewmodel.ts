@@ -6,6 +6,8 @@ import FirstCategory from "../../models/Category.model";
 import PaymentMethod from "../../models/PaymentMethod.model";
 import moment from "moment";
 import { ModalData } from "../../models/Modal.model";
+import { CashbookApi } from "../../api/Cashbook.api";
+import { CashbookDetailApi } from "../../api/CashbookDetail.api";
 
 
 export default function ListViewModel() {
@@ -31,9 +33,10 @@ export default function ListViewModel() {
   const savingList = historyList.filter(v => moment(v.date).format('YYYY-MM') === month).filter(v => v.firstCategory?.name === '저축');
 
   const [showFilterPopover, setShowFilterPopover] = useState(0);
-  const [selectedFirstIdArray, setSelectedFirstIdArray] = useState<number[]>([]);
-  const [selectedSecondIdArray, setSelectedSecondIdArray] = useState <number[]>([]);
-  const [selectedPaymentMethodIdArray, setSelectedPaymentMethodIdArray] = useState<number[]>([]);
+  const [firstCategories, setFirstCategories] = useState<number[]>([])
+  // const [selectedFirstIdArray, setSelectedFirstIdArray] = useState<number[]>([]);
+  // const [selectedSecondIdArray, setSelectedSecondIdArray] = useState <number[]>([]);
+  // const [selectedPaymentMethodIdArray, setSelectedPaymentMethodIdArray] = useState<number[]>([]);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
@@ -75,37 +78,37 @@ export default function ListViewModel() {
     setTotalSaving(savingList.map(v => v.price).reduce((price, cur) => price + cur, 0))
   }, [id, historyList, month])
 
-  // filter default
-  useEffect(() => {
-    // 거래유형 default
-    setSelectedFirstIdArray(cateogryList.map(v => v.id));
+  // // filter default
+  // useEffect(() => {
+  //   // 거래유형 default
+  //   setSelectedFirstIdArray(cateogryList.map(v => v.id));
 
-    // 1차 default
-    if(selectedSecondIdArray.length === 0){
-      setSelectedSecondIdArray(selectedSecondIdArray.concat(...cateogryList.filter(first => cateogryList.map(v => v.id).includes(first.id)).map(first => first.secondCategoryList.map(second => second.id))));
-    };
+  //   // 1차 default
+  //   if(selectedSecondIdArray.length === 0){
+  //     setSelectedSecondIdArray(selectedSecondIdArray.concat(...cateogryList.filter(first => cateogryList.map(v => v.id).includes(first.id)).map(first => first.secondCategoryList.map(second => second.id))));
+  //   };
 
-    // 결제수단 default
-    setSelectedPaymentMethodIdArray(paymentMethodList.map(v => v.id));
-  }, [cateogryList, historyList, paymentMethodList])
+  //   // 결제수단 default
+  //   setSelectedPaymentMethodIdArray(paymentMethodList.map(v => v.id));
+  // }, [cateogryList, historyList, paymentMethodList])
 
-  // first 체크에 따른 filter_second list
-  useEffect(() => {
-    setSelectedSecondIdArray(cateogryList.filter(first => selectedFirstIdArray.includes(first.id)).map(first => first.secondCategoryList.map(second => second.id)).reduce((acc, cur) => acc.concat(cur), []));
-  }, [selectedFirstIdArray])
+  // // first 체크에 따른 filter_second list
+  // useEffect(() => {
+  //   setSelectedSecondIdArray(cateogryList.filter(first => selectedFirstIdArray.includes(first.id)).map(first => first.secondCategoryList.map(second => second.id)).reduce((acc, cur) => acc.concat(cur), []));
+  // }, [selectedFirstIdArray])
 
-  // 거래유형, 1차, 결제수단 체크여부에 따른 내역 필터
-  useEffect(() => {
-    // setFilteredHistoryList(historyList.filter(v => {
-    //   return selectedFirstIdArray.includes(v.firstCategoryId)
-    // }).filter(v => {
-    //   return selectedSecondIdArray.includes(v.secondCategoryId)
-    // }).filter(v => {
-    //   if(v.paymentMethod !== null){
-    //     return selectedPaymentMethodIdArray.includes(v.paymentMethod.id)
-    //   }
-    // }));
-  }, [selectedFirstIdArray, selectedSecondIdArray, selectedPaymentMethodIdArray])
+  // // 거래유형, 1차, 결제수단 체크여부에 따른 내역 필터
+  // useEffect(() => {
+  //   setFilteredHistoryList(historyList.filter(v => {
+  //     return selectedFirstIdArray.includes(v.firstCategoryId)
+  //   }).filter(v => {
+  //     return selectedSecondIdArray.includes(v.secondCategoryId)
+  //   }).filter(v => {
+  //     if(v.paymentMethod !== null){
+  //       return selectedPaymentMethodIdArray.includes(v.paymentMethod.id)
+  //     }
+  //   }));
+  // }, [selectedFirstIdArray, selectedSecondIdArray, selectedPaymentMethodIdArray])
 
 
   const changePage = (page: number) => {
@@ -113,81 +116,61 @@ export default function ListViewModel() {
     setSearchParams(searchParams)
   }
 
-  const getHistory = () => {
-    axios.get(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/detail`, {
-      params: {
-        page: page,
-        pageSize: pageSize
-      },
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success) {
-        console.log('내역 조회 성공', response.data.data)
+  const getHistory = async () => {
+    if(id === undefined) return;
 
-        setHistoryList(response.data.data.results);
-        setFilteredHistoryList(response.data.data.results);
-        setHistoryCount(response.data.data.count);
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
+    try {
+      const result = await CashbookApi.getHistoryList(parseInt(id), page, pageSize, firstCategories);
+
+      console.log('내역 조회 성공', result)
+
+      setHistoryList(result.results);
+      setFilteredHistoryList(result.results);
+      setHistoryCount(result.count);
+
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const getCategory = () => {
-    axios.get(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/trade-category`, {
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success){
-        console.log('카테고리 조회 성공', response.data.data)
+  const getCategory = async () => {
+    if(id === undefined) return;
 
-        setCategoryList(response.data.data);
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
+    try {
+      const result = await CashbookApi.getCategoryList(parseInt(id))
+
+      console.log('카테고리 조회 성공', result)
+
+      setCategoryList(result)
+
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const getPaymentMethod = () => {
-    axios.get(`${process.env.REACT_APP_HOST_URL}v1/cash-book/${id}/payment-method`, {
-      params: {
-        cashBookId: id
-      },
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success){
-        console.log('결제수단 조회 성공', response.data.data)
+  const getPaymentMethod = async () => {
+    if(id === undefined) return;
 
-        setPaymentMethodList(response.data.data);
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
+    try {
+      const result = await CashbookApi.getPaymentMethod(parseInt(id))
+      
+      console.log('결제수단 조회 성공', result)
+
+      setPaymentMethodList(result);
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const deleteHistory = (id: number) => {
-    axios.delete(`${process.env.REACT_APP_HOST_URL}v1/cash-book-detail/${id}`, {
-      headers: {
-        Authorization: `Bearer ${tokenRef.current}`
-      }
-    })
-    .then(response => {
-      if(response.data.success){
-        console.log('내역 삭제 성공', response.data.data)
-    
-        getHistory();
-      } else{
-        alert('error')
-      }
-    }).catch(error => console.log(error))
+  const deleteHistory = async (id: number) => {
+    try {
+      const result = await CashbookDetailApi.deleteHistory(id)
+      console.log('내역 삭제 성공', result)
+
+      getHistory();
+    } catch (error) {
+      console.log(error)
+    }
   }
 
 
@@ -195,7 +178,7 @@ export default function ListViewModel() {
     historyList, filteredHistoryList, cateogryList, paymentMethodList,
     month, setMonth, totalExpense, totalSaving, totalIncome,
     showFilterPopover, setShowFilterPopover,
-    selectedFirstIdArray, setSelectedFirstIdArray, selectedSecondIdArray, setSelectedSecondIdArray, selectedPaymentMethodIdArray, setSelectedPaymentMethodIdArray,
+    // selectedFirstIdArray, setSelectedFirstIdArray, selectedSecondIdArray, setSelectedSecondIdArray, selectedPaymentMethodIdArray, setSelectedPaymentMethodIdArray,
     page, pageSize, historyCount,
     selectedHistory, setSelectedHistory, showEditHistoryModal, setShowEditHistoryModal, modalAlertData, setModalAlertData,
     getHistory, changePage, deleteHistory
